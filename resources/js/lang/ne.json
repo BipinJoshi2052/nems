@@ -1,0 +1,7 @@
+{
+    "common.cancel": "रद्द गर्नुहोस्",
+    "common.save": "बचत गर्नुहोस्",
+    "mail.subjects.password_reset": "पासवर्ड रिसेट गर्नुहोस्",
+    "mail.subjects.welcome": ":app मा स्वागत छ",
+    "validation.required": ":attribute आवश्यक छ।"
+}

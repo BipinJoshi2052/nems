@@ -1,0 +1,7 @@
+{
+    "common.cancel": "Cancel",
+    "common.save": "Save",
+    "mail.subjects.password_reset": "Reset your password",
+    "mail.subjects.welcome": "Welcome to :app",
+    "validation.required": "The :attribute field is required."
+}
