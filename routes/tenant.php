@@ -35,6 +35,11 @@ Route::middleware([
     // Authenticated Routes (Blade)
     Route::middleware('auth')->group(function() {
         Route::get('/subscription', [\App\Http\Controllers\Tenant\SubscriptionController::class, 'index'])->name('tenant.subscription.index');
+        
+        // Vue SPA Dashboard
+        Route::get('/dashboard/{any?}', function () {
+            return view('tenant.spa');
+        })->where('any', '.*')->name('tenant.dashboard');
     });
 
     // API Auth Endpoints
