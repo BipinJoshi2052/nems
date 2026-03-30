@@ -100,16 +100,14 @@ class ProvisionTenantJob implements ShouldQueue
 
             // 6. Create Subscription (Fetch plan from central DB)
             if ($this->planId) {
-                $plan = DB::table('plans')->where('id', $this->planId)->first();
+                $plan = \App\Models\Plan::find($this->planId);
                 if ($plan) {
                     \Log::info("Creating subscription for plan: {$plan->name}");
-                    DB::table('subscriptions')->insert([
+                    \App\Models\Subscription::create([
                         'tenant_id' => $this->tenantId,
                         'plan_id' => $this->planId,
                         'status' => 'trial',
                         'trial_ends_at' => now()->addDays($plan->trial_days ?? 14),
-                        'created_at' => now(),
-                        'updated_at' => now(),
                     ]);
                 }
             }
@@ -125,8 +123,9 @@ class ProvisionTenantJob implements ShouldQueue
                 ]);
             }
 
-            // 8. Mark Tenant Trial
-            DB::table('tenants')->where('id', $this->tenantId)->update(['status' => 'trial']);
+            // 8. Mark Tenant Trial (Enforcing State Machine)
+            \Log::info("Transitioning tenant status to 'trial'");
+            $tenant->transitionTo(\App\Models\Tenant::STATUS_TRIAL);
 
             // 9. Send Welcome Email
             try {

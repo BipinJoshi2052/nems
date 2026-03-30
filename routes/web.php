@@ -9,7 +9,19 @@ use App\Http\Controllers\Site\PasswordSetupController;
 use App\Http\Controllers\Site\ProvisioningController;
 
 // Auth & Identity
+// Auth & Identity
 Route::get('/login', [\App\Platform\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/platform/login', [\App\Platform\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('platform.login');
+Route::post('/login', [\App\Platform\Controllers\Auth\LoginController::class, 'login'])->name('platform.login.attempt');
+Route::post('/logout', [\App\Platform\Controllers\Auth\LoginController::class, 'logout'])->name('platform.logout');
+
+Route::middleware('guest:platform')->group(function () {
+    Route::get('/forgot-password', [\App\Platform\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('platform.password.request');
+    Route::post('/forgot-password', [\App\Platform\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('platform.password.email');
+    Route::get('/platform/reset-password/{token}', [\App\Platform\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('platform.password.reset');
+    Route::post('/reset-password', [\App\Platform\Controllers\Auth\ForgotPasswordController::class, 'reset'])->name('platform.password.update');
+});
+
 Route::get('/api/check-subdomain', [RegisterController::class, 'checkSubdomainAvailability'])->name('api.check-subdomain');
 
 // Public Pages

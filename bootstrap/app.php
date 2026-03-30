@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
             'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
             'platform.tenant' => \App\Http\Middleware\TenantOnlyMiddleware::class,
+            'tenant.status' => \App\Http\Middleware\Tenant\CheckTenantStatus::class,
         ]);
 
         $middleware->appendToGroup('web', [
