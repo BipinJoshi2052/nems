@@ -1,18 +1,20 @@
-@extends('layouts.tenant')
+@extends('tenant-website.layouts.tenant')
 
 @section('title', __('Reset Password'))
 
 @section('content')
-<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-montessori-cream">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-100">
+        <div class="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
             <div class="text-center mb-8">
-                <i class="bi bi-key text-primary-600 text-4xl"></i>
-                <h2 class="mt-4 text-2xl font-extrabold text-gray-900 tracking-tight">
-                    {{ __('Set New Password') }}
+                <div class="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center shadow-inner">
+                    <i class="bi bi-key text-primary-600 text-3xl"></i>
+                </div>
+                <h2 class="text-3xl font-display font-bold text-gray-900">
+                    {{ tenant('name') }}
                 </h2>
-                <p class="mt-2 text-sm text-gray-500">
-                    {{ __('Please enter your new password below.') }}
+                <p class="mt-2 text-sm text-gray-500 font-medium tracking-wide italic">
+                    {{ __('Set your new portal password') }}
                 </p>
             </div>
 

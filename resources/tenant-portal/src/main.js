@@ -12,6 +12,8 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
 
+import { useAuthStore } from './stores/auth';
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -26,10 +28,15 @@ const vuetify = createVuetify({
 });
 
 const app = createApp(App);
+const pinia = createPinia();
 
-app.use(createPinia());
+app.use(pinia);
 app.use(router);
 app.use(vuetify);
 app.use(i18n);
 
-app.mount('#app');
+// Restore session before mounting
+const authStore = useAuthStore(pinia);
+authStore.refresh().finally(() => {
+  app.mount('#app');
+});

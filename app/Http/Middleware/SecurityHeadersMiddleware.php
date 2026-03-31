@@ -31,26 +31,29 @@ class SecurityHeadersMiddleware
     private function contentSecurityPolicy(): string
     {
         $bunny = 'https://fonts.bunny.net';
+        $googleFonts = 'https://fonts.googleapis.com';
+        $googleStatic = 'https://fonts.gstatic.com';
         $jsdelivr = 'https://cdn.jsdelivr.net';
 
         $common = implode('; ', [
             "default-src 'self'",
             "img-src 'self' data: blob:",
-            "font-src 'self' data: {$bunny}",
+            "font-src 'self' data: {$bunny} {$googleStatic}",
         ]);
 
         if (! app()->environment('local')) {
-            return "{$common}; script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr}; style-src 'self' 'unsafe-inline' {$bunny} {$jsdelivr}; connect-src 'self'";
+            return "{$common}; script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr}; style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr}; connect-src 'self'";
         }
 
-        // Local: Vite dev (vite.config.js) + optional Bunny fonts + Bootstrap CDN fallback (welcome.blade)
-        $viteHttp = 'http://127.0.0.1:5173 http://localhost:5173 http://0.0.0.0:5173';
-        $viteWs = 'ws://127.0.0.1:5173 ws://localhost:5173 ws://0.0.0.0:5173';
+        // Local: Vite dev (vite.config.js)
+        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173';
+        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173';
 
         return implode('; ', [
             $common,
+            "font-src 'self' data: {$bunny} {$googleStatic} {$viteHttp}",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr} {$viteHttp}",
-            "style-src 'self' 'unsafe-inline' {$bunny} {$jsdelivr} {$viteHttp}",
+            "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr} {$viteHttp}",
             "connect-src 'self' {$viteHttp} {$viteWs}",
         ]);
     }

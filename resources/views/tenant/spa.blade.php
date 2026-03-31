@@ -15,13 +15,7 @@
     <!-- CSS / JS -->
     @vite(['resources/tenant-portal/src/main.js'])
 </head>
-<body>
+<body class="bg-gray-50">
     <div id="app"></div>
-
-    <script type="module">
-        // Placeholder for SPA development
-        // For production, we will use @vite('resources/tenant-portal/src/main.js')
-        // But the current vite.php config needs to aware of this path.
-    </script>
 </body>
 </html>

@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Tenant\Auth\ForgotPasswordController;
+use App\Http\Controllers\Tenant\Auth\LoginController;
+use App\Http\Controllers\Tenant\HomeController;
+use App\Http\Controllers\Tenant\SubscriptionController;
 use App\Http\Middleware\ResolveTenant;
 use Illuminate\Support\Facades\Route;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomainOrSubdomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /*
@@ -21,31 +25,39 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 Route::middleware([
     'web',
+    InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-    InitializeTenancyByDomainOrSubdomain::class,
     ResolveTenant::class,
     'tenant.status',
-])->group(function (): void {
-    // Guest Routes (Blade)
-    Route::middleware('guest')->group(function() {
-        Route::get('/login', [\App\Http\Controllers\Tenant\Auth\LoginController::class, 'showLoginForm'])->name('tenant.login');
-        Route::get('/reset-password/{token}', [\App\Http\Controllers\Tenant\Auth\ForgotPasswordController::class, 'showResetForm'])->name('tenant.password.reset');
-    });
+])
+// Only match subdomains of nems.com for tenant routes
+    // ->domain('{subdomain}.nems.com')
+    ->group(function (): void {
+        // Tenant Home
+        Route::get('/', [HomeController::class, 'index'])->name('tenant.home');
 
-    // Authenticated Routes (Blade)
-    Route::middleware('auth')->group(function() {
-        Route::get('/subscription', [\App\Http\Controllers\Tenant\SubscriptionController::class, 'index'])->name('tenant.subscription.index');
-        
-        // Vue SPA Dashboard
+        // Guest Routes (Blade)
+        Route::middleware('guest')->group(function () {
+            Route::get('/login', [LoginController::class, 'showLoginForm'])->name('tenant.login');
+            Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('tenant.password.reset');
+        });
+
+        // Authenticated Routes (Blade)
+        Route::middleware('auth')->group(function () {
+            Route::get('/subscription', [SubscriptionController::class, 'index'])->name('tenant.subscription.index');
+        });
+
+        // Vue SPA Dashboard (Public entry, SPA handles internal auth)
         Route::get('/dashboard/{any?}', function () {
             return view('tenant.spa');
         })->where('any', '.*')->name('tenant.dashboard');
-    });
 
-    // API Auth Endpoints
-    Route::prefix('api/auth')->group(function() {
-        Route::post('/login', [\App\Http\Controllers\Tenant\Auth\LoginController::class, 'login']);
-        Route::post('/forgot-password', [\App\Http\Controllers\Tenant\Auth\ForgotPasswordController::class, 'sendResetLink']);
-        Route::post('/reset-password', [\App\Http\Controllers\Tenant\Auth\ForgotPasswordController::class, 'resetPassword']);
+        // API Auth Endpoints
+        Route::prefix('api/auth')->group(function () {
+            Route::post('/login', [LoginController::class, 'login']);
+            Route::post('/refresh', [LoginController::class, 'refresh']);
+            Route::post('/logout', [LoginController::class, 'logout']);
+            Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+            Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
+        });
     });
-});

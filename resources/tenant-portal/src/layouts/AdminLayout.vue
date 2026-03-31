@@ -77,8 +77,8 @@ let pollInterval = null;
 
 const fetchUnreadCount = async () => {
   try {
-    const { data } = await axios.get('/api/notifications/unread-count');
-    unreadCount.value = data.count;
+    // const { data } = await axios.get('/api/notifications/unread-count');
+    // unreadCount.value = data.count;
   } catch (err) {
     // Silent fail for polling
   }

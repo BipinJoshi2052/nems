@@ -21,6 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
         ]);
+
+        $middleware->redirectTo(
+            guests: fn (\Illuminate\Http\Request $request) => (function_exists('tenant') && tenant())
+                ? route('tenant.login')
+                : route('login')
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
