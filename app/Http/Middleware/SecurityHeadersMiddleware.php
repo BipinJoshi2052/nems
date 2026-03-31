@@ -34,23 +34,26 @@ class SecurityHeadersMiddleware
         $googleFonts = 'https://fonts.googleapis.com';
         $googleStatic = 'https://fonts.gstatic.com';
         $jsdelivr = 'https://cdn.jsdelivr.net';
-
-        $common = implode('; ', [
-            "default-src 'self'",
-            "img-src 'self' data: blob:",
-            "font-src 'self' data: {$bunny} {$googleStatic}",
-        ]);
+        $uiAvatars = 'https://ui-avatars.com';
 
         if (! app()->environment('local')) {
-            return "{$common}; script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr}; style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr}; connect-src 'self'";
+            return implode('; ', [
+                "default-src 'self'",
+                "img-src 'self' data: blob: {$uiAvatars}",
+                "font-src 'self' data: {$bunny} {$googleStatic}",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr}",
+                "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr}",
+                "connect-src 'self'",
+            ]);
         }
 
         // Local: Vite dev (vite.config.js)
-        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173';
-        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173';
+        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174';
+        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174';
 
         return implode('; ', [
-            $common,
+            "default-src 'self'",
+            "img-src 'self' data: blob: {$uiAvatars}",
             "font-src 'self' data: {$bunny} {$googleStatic} {$viteHttp}",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr} {$viteHttp}",
             "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr} {$viteHttp}",

@@ -1,9 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan route:list --path=tenant)",
-      "Bash(curl -I \"http://nems.com/vendor/tailwind/tailwind.js\")",
-      "Bash(php artisan tinker --execute=\"echo ''Tenants: ''; foreach(\\App\\Models\\Tenant::all() as $t) { echo $t->domain . '' - '' . $t->name . PHP_EOL; }\")"
+      "Bash(npm install vue3-apexcharts apexcharts)",
+      "Bash(php artisan route:list --path=dashboard)"
     ],
     "deny": [],
     "ask": []

@@ -2,10 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/dashboard'),
   routes: [
     {
-      path: '/dashboard',
+      path: '/',
       component: () => import('../layouts/AdminLayout.vue'), // Default
       meta: { requiresAuth: true },
       children: [
@@ -18,8 +18,14 @@ const router = createRouter({
       ],
     },
     {
+      path: '/crm',
+      name: 'dashboard.crm',
+      component: () => import('../views/CRMDashboard.vue'),
+      meta: { requiresAuth: false },
+    },
+    {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard',
+      redirect: '/',
     },
   ],
 });
