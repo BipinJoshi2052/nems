@@ -235,11 +235,11 @@
 
               <div>
                 <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300 uppercase tracking-wider text-[10px]">Date of Birth (AD)</label>
-                <input v-model="form.date_of_birth_ad" type="date" class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all" required />
+                <flat-pickr v-model="form.date_of_birth_ad" :config="flatpickrConfig" class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all" placeholder="YYYY-MM-DD" required />
               </div>
-              <div>
+              <div class="nepali-datepicker-wrapper">
                 <label class="block text-sm font-medium mb-1.5 text-gray-700 dark:text-gray-300 uppercase tracking-wider text-[10px]">Date of Birth (BS)</label>
-                <input v-model="form.date_of_birth_bs" type="text" placeholder="YYYY-MM-DD" class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all" />
+                <VNepaliDatePicker v-model="dobAsDate" class="vue-nepali-datepicker" placeholder="YYYY-MM-DD" />
               </div>
             </div>
 
@@ -296,13 +296,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import _ from 'lodash'
 import MainLayout from '@/components/layout/MainLayout.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import FlatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
+import { VNepaliDatePicker } from 'vue-nepali-date-picker'
+import 'vue-nepali-date-picker/dist/style.css'
+import NepaliDate from 'nepali-date-converter'
 
 const router = useRouter()
 
@@ -369,6 +374,30 @@ const initialForm = {
 
 const photoPreview = ref(null)
 const photoInput = ref<HTMLInputElement | null>(null)
+const isSyncing = ref(false)
+
+const dobAsDate = computed({
+  get: () => {
+    if (!form.value.date_of_birth_ad) return null
+    const [y, m, d] = form.value.date_of_birth_ad.split('-').map(Number)
+    return new Date(y, m - 1, d)
+  },
+  set: (val) => {
+    if (val instanceof Date && !isNaN(val.getTime())) {
+      const y = val.getFullYear()
+      const m = String(val.getMonth() + 1).padStart(2, '0')
+      const d = String(val.getDate()).padStart(2, '0')
+      form.value.date_of_birth_ad = `${y}-${m}-${d}`
+    } else {
+      form.value.date_of_birth_ad = ''
+    }
+  }
+})
+
+const flatpickrConfig = {
+  allowInput: true,
+  dateFormat: 'Y-m-d',
+}
 
 const onFileSelected = (event: any) => {
   const file = event.target.files[0]
@@ -381,8 +410,43 @@ const onFileSelected = (event: any) => {
 }
 
 const form = ref({ ...initialForm })
-
 const statusForm = ref({ ...initialFormStatus })
+
+// Auto-sync AD to BS
+watch(() => form.value.date_of_birth_ad, (newAd) => {
+  if (isSyncing.value || !newAd) return
+  isSyncing.value = true
+  try {
+    const [y, m, d] = newAd.split('-').map(Number)
+    if (y && m && d) {
+      const nDate = new NepaliDate(y, m - 1, d)
+      form.value.date_of_birth_bs = nDate.format('YYYY-MM-DD')
+    }
+  } catch (e) {
+    console.error('AD to BS conversion failed', e)
+  }
+  setTimeout(() => isSyncing.value = false, 50)
+})
+
+// Auto-sync BS to AD
+watch(() => form.value.date_of_birth_bs, (newBs) => {
+  if (isSyncing.value || !newBs || newBs.length < 10) return
+  isSyncing.value = true
+  try {
+    const [y, m, d] = newBs.split('-').map(Number)
+    if (y && m && d) {
+        const nDate = new NepaliDate(y, m - 1, d)
+        const adDate = nDate.toJsDate()
+        const ay = adDate.getFullYear()
+        const am = String(adDate.getMonth() + 1).padStart(2, '0')
+        const ad = String(adDate.getDate()).padStart(2, '0')
+        form.value.date_of_birth_ad = `${ay}-${am}-${ad}`
+    }
+  } catch (e) {
+    console.error('BS to AD conversion failed', e)
+  }
+  setTimeout(() => isSyncing.value = false, 50)
+})
 
 const fetchStudents = async (page = 1) => {
   loading.value = true
@@ -558,3 +622,60 @@ onMounted(async () => {
 const viewProfile = (student: Student) => console.log('View profile:', student)
 const editStudent = (student: Student) => console.log('Edit student:', student)
 </script>
+
+<style scoped>
+.nepali-datepicker-wrapper :deep(.vue-nepali-datepicker) {
+  width: 100% !important;
+}
+
+.nepali-datepicker-wrapper :deep(input) {
+  width: 100% !important;
+  padding: 0.625rem 1rem !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid #e5e7eb !important;
+  background-color: #fff !important;
+  color: #111827 !important;
+  outline: none !important;
+  transition: all 0.2s !important;
+}
+
+:deep(.dark) .nepali-datepicker-wrapper :deep(input) {
+  border-color: #374151 !important;
+  background-color: #1f2937 !important;
+  color: #fff !important;
+}
+
+.nepali-datepicker-wrapper :deep(input:focus) {
+  border-color: #465fff !important;
+  box-shadow: 0 0 0 4px rgba(70, 95, 255, 0.1) !important;
+}
+
+/* Calendar Popup Styles */
+:deep(.v-nepali-datepicker-container) {
+  z-index: 999999 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+  border: 1px solid #e5e7eb !important;
+  margin-top: 0.5rem !important;
+}
+
+:deep(.dark) :deep(.v-nepali-datepicker-container) {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #fff !important;
+}
+
+:deep(.v-nepali-datepicker-calendar-day.selected) {
+  background-color: #465fff !important;
+  color: white !important;
+}
+
+:deep(.v-nepali-datepicker-calendar-day:hover:not(.selected)) {
+  background-color: #f3f4f6 !important;
+}
+
+:deep(.dark) :deep(.v-nepali-datepicker-calendar-day:hover:not(.selected)) {
+  background-color: #374151 !important;
+}
+</style>
+
