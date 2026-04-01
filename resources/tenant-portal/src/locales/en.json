@@ -1,8 +1,40 @@
 {
-  "dashboard": "Dashboard",
-  "logout": "Logout",
-  "welcome": "Welcome",
-  "profile": "Profile",
-  "notifications": "Notifications",
-  "home": "Home"
+    "common": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "delete": "Delete",
+        "edit": "Edit",
+        "save": "Save",
+        "search": "Search"
+    },
+    "mail": {
+        "subjects": {
+            "password_reset": "Reset your password",
+            "welcome": "Welcome to :app"
+        }
+    },
+    "menu": {
+        "attendance": "Attendance",
+        "calendar": "Calendar",
+        "dashboard": "Dashboard",
+        "finance": "Finance",
+        "parents": "Parents",
+        "profile": "User Profile",
+        "school_settings": "School Settings",
+        "settings": "Settings",
+        "staff": "Staff",
+        "students": "Students",
+        "title": "Menu",
+        "user_management": "User Management",
+        "user_profile": "User Profile"
+    },
+    "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "pending": "Pending"
+    },
+    "validation": {
+        "email": "The :attribute must be a valid email address.",
+        "required": "The :attribute field is required."
+    }
 }

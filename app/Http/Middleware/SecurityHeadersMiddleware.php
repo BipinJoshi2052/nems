@@ -34,6 +34,7 @@ class SecurityHeadersMiddleware
         $googleFonts = 'https://fonts.googleapis.com';
         $googleStatic = 'https://fonts.gstatic.com';
         $jsdelivr = 'https://cdn.jsdelivr.net';
+        $tailwind = 'https://cdn.tailwindcss.com';
         $uiAvatars = 'https://ui-avatars.com';
 
         if (! app()->environment('local')) {
@@ -41,8 +42,8 @@ class SecurityHeadersMiddleware
                 "default-src 'self'",
                 "img-src 'self' data: blob: {$uiAvatars}",
                 "font-src 'self' data: {$bunny} {$googleStatic}",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr}",
-                "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr}",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr} {$tailwind}",
+                "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr} {$tailwind}",
                 "connect-src 'self'",
             ]);
         }
@@ -56,8 +57,8 @@ class SecurityHeadersMiddleware
             "default-src 'self'",
             "img-src 'self' data: blob: {$uiAvatars} {$appDomains}",
             "font-src 'self' data: {$bunny} {$googleStatic} {$viteHttp}",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr} {$viteHttp}",
-            "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr} {$viteHttp}",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr} {$viteHttp} {$tailwind}",
+            "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr} {$viteHttp} {$tailwind}",
             "connect-src 'self' {$viteHttp} {$viteWs}",
         ]);
     }

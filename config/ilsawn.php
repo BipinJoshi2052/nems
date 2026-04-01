@@ -77,22 +77,17 @@ return [
     |
     */
     'scan_paths' => [
-        'app',
-        'resources',
+        'app/Http/Controllers',
+        'resources/views',
+        'resources/tenant-admin-portal/src',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Scan Exclude Paths
-    |--------------------------------------------------------------------------
-    |
-    | Paths (relative to base_path()) that should be excluded from key scanning.
-    | The ilsawn JS adapter files are excluded by default because they reference
-    | __() as a function definition, not as actual translation calls.
-    |
-    */
     'scan_exclude' => [
         'resources/js/vendor/ilsawn',
+        'resources/tenant-admin-portal/node_modules',
+        'node_modules',
+        'vendor',
+        'storage',
     ],
 
     /*
@@ -118,6 +113,6 @@ return [
     | Gate defined in app/Providers/IlsawnServiceProvider.php.
     |
     */
-    'middleware' => ['web'],
+    'middleware' => ['web', 'auth:platform', 'platform.admin'],
 
 ];

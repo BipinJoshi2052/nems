@@ -37,5 +37,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('platform-login', function (Request $request) {
             return Limit::perMinutes(15, 5)->by($request->ip());
         });
+
+        \Illuminate\Support\Facades\Gate::define('viewIlsawn', function ($user) {
+            return $user && method_exists($user, 'isPlatformAdmin') && $user->isPlatformAdmin();
+        });
     }
 }

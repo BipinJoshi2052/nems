@@ -4,7 +4,7 @@ import ne from './locales/ne.json';
 
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',
+  locale: typeof localStorage !== 'undefined' ? localStorage.getItem('locale') || 'en' : 'en',
   fallbackLocale: 'en',
   messages: {
     en,

@@ -1,8 +1,40 @@
 {
-  "dashboard": "ड्यासबोर्ड",
-  "logout": "लगआउट",
-  "welcome": "स्वागत छ",
-  "profile": "प्रोफाइल",
-  "notifications": "सूचना",
-  "home": "गृह"
+    "common": {
+        "cancel": "रद्द गर्नुहोस्",
+        "confirm": "पुष्टि गर्नुहोस्",
+        "delete": "मेट्नुहोस्",
+        "edit": "सम्पादन गर्नुहोस्",
+        "save": "बचत गर्नुहोस्",
+        "search": "खोज्नुहोस्"
+    },
+    "mail": {
+        "subjects": {
+            "password_reset": "पासवर्ड रिसेट गर्नुहोस्",
+            "welcome": ":app मा स्वागत छ"
+        }
+    },
+    "menu": {
+        "attendance": "हाजिरी",
+        "calendar": "पात्रो",
+        "dashboard": "ड्यासबोर्ड",
+        "finance": "वित्त",
+        "parents": "अभिभावकहरू",
+        "profile": "प्रयोगकर्ता प्रोफाइल",
+        "school_settings": "विद्यालय सेटिङहरू",
+        "settings": "सेटिङहरू",
+        "staff": "कर्मचारी",
+        "students": "विद्यार्थीहरू",
+        "title": "मेनु",
+        "user_management": "प्रयोगकर्ता व्यवस्थापन",
+        "user_profile": "प्रयोगकर्ता प्रोफाइल"
+    },
+    "status": {
+        "active": "सक्रिय",
+        "inactive": "निष्क्रिय",
+        "pending": "पेन्डिङ"
+    },
+    "validation": {
+        "email": ":attribute वैध इमेल ठेगाना हुनुपर्छ।",
+        "required": ":attribute आवश्यक छ।"
+    }
 }

@@ -60,7 +60,7 @@
               ]"
             >
               <template v-if="isExpanded || isHovered || isMobileOpen">
-                {{ menuGroup.title }}
+                {{ $t('menu.' + menuGroup.title.toLowerCase().replace(' ', '_')) }}
               </template>
               <HorizontalDots v-else />
             </h2>
@@ -92,7 +92,7 @@
                   <span
                     v-if="isExpanded || isHovered || isMobileOpen"
                     class="menu-item-text"
-                    >{{ item.name }}</span
+                    >{{ $t('menu.' + item.name.toLowerCase().replace(' ', '_')) }}</span
                   >
                   <ChevronDownIcon
                     v-if="isExpanded || isHovered || isMobileOpen"
@@ -130,7 +130,7 @@
                   <span
                     v-if="isExpanded || isHovered || isMobileOpen"
                     class="menu-item-text"
-                    >{{ item.name }}</span
+                    >{{ $t('menu.' + item.name.toLowerCase().replace(' ', '_')) }}</span
                   >
                 </router-link>
                 <transition
@@ -161,7 +161,7 @@
                             },
                           ]"
                         >
-                          {{ subItem.name }}
+                          {{ $t('menu.' + subItem.name.toLowerCase().replace(' ', '_')) }}
                           <span class="flex items-center gap-1 ml-auto">
                             <span
                               v-if="subItem.new"

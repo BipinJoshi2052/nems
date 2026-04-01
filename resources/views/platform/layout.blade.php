@@ -119,6 +119,12 @@
                                         {{ __('Tenants') }}
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('ilsawn.index') }}" class="{{ request()->is('ilsawn*') ? 'nav-link-active' : 'nav-link-inactive' }}">
+                                        <i class="bi bi-translate me-3"></i>
+                                        {{ __('Translations') }}
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>

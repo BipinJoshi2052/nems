@@ -254,7 +254,7 @@
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {{ loading ? 'Enrolling...' : 'Complete Admission' }}
+                {{ loading ? 'Enrolling...' : $t('common.save') }}
               </button>
             </div>
           </div>
@@ -273,7 +273,7 @@
            <div>
              <label class="block text-sm font-medium mb-1 dark:text-white">New Status</label>
              <select v-model="statusForm.status" class="w-full px-4 py-2 border rounded dark:bg-form-input text-black dark:text-white">
-               <option value="active">Active</option>
+               <option value="active">{{ $t('status.active') }}</option>
                <option value="withdrawn">Withdrawn</option>
                <option value="graduated">Graduated</option>
              </select>
@@ -283,7 +283,7 @@
              <textarea v-model="statusForm.reason" class="w-full px-4 py-2 border rounded dark:bg-form-input text-black dark:text-white" required></textarea>
            </div>
            <div class="flex justify-end gap-2 mt-6">
-             <button type="button" @click="showStatusModal = false" class="px-4 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700">Cancel</button>
+             <button type="button" @click="showStatusModal = false" class="px-4 py-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700">{{ $t('common.cancel') }}</button>
              <button type="submit" :disabled="loading" class="px-4 py-2 bg-primary text-white rounded hover:bg-opacity-90 disabled:opacity-50 font-semibold">
                Update Status
              </button>

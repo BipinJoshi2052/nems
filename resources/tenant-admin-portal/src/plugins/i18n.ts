@@ -4,7 +4,7 @@ import ne from '../locales/ne.json'
 
 const i18n = createI18n({
   legacy: false, // use Composition API
-  locale: 'en',
+  locale: localStorage.getItem('locale') || 'en',
   fallbackLocale: 'en',
   messages: {
     en,
