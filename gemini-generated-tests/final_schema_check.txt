@@ -1,0 +1,12 @@
+Checking tenant: 1e116217-fb28-4ba1-8bd1-c7f2a5af7f36
+Columns in 'students': id, name, admission_no, class_id, academic_year_id, created_at, updated_at, date_of_birth_ad, date_of_birth_bs, gender, photo_attachment_id, medical_notes, status, withdrawal_reason, withdrawn_at
+Columns in 'parents': id, name, email, phone, address, gender, occupation, relationship, student_id, created_at, updated_at
+Columns in 'users': id, name, email, password, is_owner, remember_token, created_at, updated_at, is_setup_complete, language_preference, designation, deactivated_at
+Checking tenant: f0e35e64-e33f-48c4-82f4-470895aa7399
+Columns in 'students': id, name, admission_no, class_id, academic_year_id, created_at, updated_at, date_of_birth_ad, date_of_birth_bs, gender, photo_attachment_id, medical_notes, status, withdrawal_reason, withdrawn_at
+Columns in 'parents': id, name, email, phone, address, gender, occupation, relationship, student_id, created_at, updated_at
+Columns in 'users': id, name, email, password, is_owner, remember_token, created_at, updated_at, is_setup_complete, language_preference, designation, deactivated_at
+Checking tenant: b6adffee-cf44-4c26-9228-65ad4c1bf4b9
+Columns in 'students': id, name, admission_no, class_id, academic_year_id, created_at, updated_at, date_of_birth_ad, date_of_birth_bs, gender, photo_attachment_id, medical_notes, status, withdrawal_reason, withdrawn_at
+Columns in 'parents': id, name, email, phone, address, gender, occupation, relationship, student_id, created_at, updated_at
+Columns in 'users': id, name, email, password, is_owner, remember_token, created_at, updated_at, is_setup_complete, language_preference, designation, deactivated_at

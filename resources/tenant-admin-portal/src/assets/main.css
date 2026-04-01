@@ -160,6 +160,13 @@ layer(base);
   --z-index-9999: 9999;
   --z-index-99999: 99999;
   --z-index-999999: 999999;
+  --color-primary: #465fff;
+  --color-primary-dark: #3641f5;
+  --color-boxdark: #24303f;
+  --color-boxdark-2: #1a222c;
+  --color-strokedark: #2d3a4b;
+  --color-form-input: #1d2a3a;
+  --color-meta-4: #313d4a;
 }
 
 /*

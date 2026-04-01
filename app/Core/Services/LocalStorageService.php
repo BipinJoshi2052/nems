@@ -40,7 +40,7 @@ class LocalStorageService implements StorageServiceInterface
         $thumb = $manager->read($path);
         $thumb->scaleDown(width: self::THUMB_MAX, height: self::THUMB_MAX);
 
-        $disk = Storage::disk('local');
+        $disk = Storage::disk('public');
 
         $disk->put($originalRelative, $original->toJpeg(self::ORIGINAL_QUALITY)->toString());
         $disk->put($thumbRelative, $thumb->toJpeg(self::THUMB_QUALITY)->toString());
@@ -53,7 +53,7 @@ class LocalStorageService implements StorageServiceInterface
 
     public function delete(string ...$paths): void
     {
-        $disk = Storage::disk('local');
+        $disk = Storage::disk('public');
         foreach ($paths as $path) {
             if ($path !== '' && $disk->exists($path)) {
                 $disk->delete($path);

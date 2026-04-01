@@ -13,25 +13,45 @@ class WriteAuditLogJob implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public ?int $userId,
+        public ?string $userId,
         public string $action,
         public ?string $subjectType,
-        public ?int $subjectId,
+        public ?string $subjectId,
         public ?array $oldValues,
         public ?array $newValues,
         public ?string $ip,
+        public ?string $dbConnection = null,
     ) {}
 
     public function handle(): void
     {
-        AuditLog::query()->create([
-            'user_id' => $this->userId,
-            'action' => $this->action,
-            'subject_type' => $this->subjectType,
-            'subject_id' => $this->subjectId,
-            'old_values' => $this->oldValues,
-            'new_values' => $this->newValues,
-            'ip' => $this->ip,
-        ]);
+        // Set connection if provided, otherwise detect
+        $conn = $this->dbConnection;
+        
+        if (!$conn) {
+            $conn = app()->bound('tenant') ? 'tenant' : config('database.default');
+        }
+
+        if ($conn === 'tenant') {
+            AuditLog::on('tenant')->create([
+                'user_id' => $this->userId,
+                'action' => $this->action,
+                'subject_type' => $this->subjectType,
+                'subject_id' => $this->subjectId,
+                'old_values' => $this->oldValues,
+                'new_values' => $this->newValues,
+                'ip' => $this->ip,
+            ]);
+        } else {
+            \App\Models\PlatformAuditLog::create([
+                'admin_id' => $this->userId,
+                'action' => $this->action,
+                'subject_type' => $this->subjectType,
+                'subject_id' => $this->subjectId,
+                'old_values' => $this->oldValues,
+                'new_values' => $this->newValues,
+                'ip' => $this->ip,
+            ]);
+        }
     }
 }

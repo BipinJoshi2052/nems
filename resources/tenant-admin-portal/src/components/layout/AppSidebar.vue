@@ -264,29 +264,6 @@ const allMenuGroups = [
         roles: ["admin", "teacher", "accountant", "receptionist", "staff", "parent"],
       },
       {
-        name: "Forms",
-        icon: ListIcon,
-        roles: ["admin"],
-        subItems: [
-          { name: "Form Elements", path: "/form-elements", pro: false },
-        ],
-      },
-      {
-        name: "Tables",
-        icon: TableIcon,
-        roles: ["admin"],
-        subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-      },
-      {
-        name: "Pages",
-        icon: PageIcon,
-        roles: ["admin"],
-        subItems: [
-          { name: "Black Page", path: "/blank", pro: false },
-          { name: "404 Page", path: "/error-404", pro: false },
-        ],
-      },
-      {
         name: "Finance",
         icon: TableIcon,
         roles: ["admin", "accountant"],
@@ -298,6 +275,40 @@ const allMenuGroups = [
         roles: ["admin", "teacher", "parent"],
         path: "/attendance",
       }
+    ],
+  },
+  {
+    title: "User Management",
+    items: [
+      {
+        icon: UserCircleIcon,
+        name: "Staff",
+        path: "/staff",
+        roles: ["admin"],
+      },
+      {
+        icon: UserCircleIcon,
+        name: "Students",
+        path: "/students",
+        roles: ["admin", "teacher"],
+      },
+      {
+        icon: UserCircleIcon,
+        name: "Parents",
+        path: "/parents",
+        roles: ["admin", "teacher"],
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      {
+        icon: PlugInIcon,
+        name: "School Settings",
+        path: "/settings/school",
+        roles: ["admin"],
+      },
     ],
   },
 ];

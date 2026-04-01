@@ -1,25 +1,93 @@
+<style scoped>
+</style>
 <template>
   <div>
     <div class="p-5 mb-6 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         <div class="flex flex-col items-center w-full gap-6 xl:flex-row">
-          <div
-            class="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800"
-          >
-            <img src="/images/user/owner.jpg" alt="user" />
+          <div class="relative group">
+            <div
+              class="w-24 h-24 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800"
+            >
+              <img 
+                v-if="user.original?.url"
+                :src="user.original.url" 
+                @click="showFullImage"
+                class="w-full h-full object-cover cursor-pointer hover:scale-110 transition-transform duration-300"
+                alt="user" 
+              />
+              <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center text-primary text-3xl font-bold">
+                {{ (user.name || 'U').charAt(0) }}
+              </div>
+            </div>
+            <button 
+              @click="$refs.fileInput.click()"
+              class="absolute bottom-0 right-0 p-1.5 bg-primary text-white rounded-full shadow-lg hover:bg-opacity-90 transition-all opacity-0 group-hover:opacity-100"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </button>
+            <input 
+              type="file" 
+              ref="fileInput" 
+              class="hidden" 
+              accept="image/*"
+              @change="handlePhotoUpload"
+            />
           </div>
           <div class="order-3 xl:order-2">
             <h4
               class="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left"
             >
-              Musharof Chowdhury
+              {{ user.name }}
             </h4>
             <div
               class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left"
             >
-              <p class="text-sm text-gray-500 dark:text-gray-400">Team Manager</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.designation || user.role || type }}</p>
               <div class="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Arizona, United States</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+            </div>
+            <!-- Deactivate Button below name/email -->
+            <div v-if="type === 'staff'" class="mt-4 flex justify-center xl:justify-start">
+              <button 
+                @click="toggleDeactivate" 
+                class="flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-medium shadow-theme-xs transition-colors dark:bg-gray-800 lg:inline-flex lg:w-auto"
+                :class="user.deactivated_at ? 'text-green-600 border-green-600 hover:bg-green-50' : 'text-red-600 border-red-600 hover:bg-red-50'"
+              >
+                <svg
+                  v-if="!user.deactivated_at"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <svg
+                  v-else
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M12 16v2"></path>
+                </svg>
+                {{ user.deactivated_at ? 'Activate Account' : 'Deactivate Account' }}
+              </button>
             </div>
           </div>
           <div class="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
@@ -27,7 +95,7 @@
               href="https://www.facebook.com/PimjoHQ"
               target="_blank"
               rel="noopener"
-              class="social-button"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-400 transition-colors hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-gray-800 dark:text-gray-400 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white"
             >
               <svg
                 class="fill-current"
@@ -43,7 +111,7 @@
                 />
               </svg>
             </a>
-            <a href="https://x.com/PimjoHQ" target="_blank" rel="noopener" class="social-button">
+            <a href="https://x.com/PimjoHQ" target="_blank" rel="noopener" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-400 transition-colors hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-gray-800 dark:text-gray-400 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white">
               <svg
                 class="fill-current"
                 width="20"
@@ -62,7 +130,7 @@
               href="https://www.linkedin.com/company/pimjo/"
               target="_blank"
               rel="noopener"
-              class="social-button"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-400 transition-colors hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-gray-800 dark:text-gray-400 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white"
             >
               <svg
                 class="fill-current"
@@ -82,7 +150,7 @@
               href="https://www.instagram.com/PimjoHQ"
               target="_blank"
               rel="noopener"
-              class="social-button"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-400 transition-colors hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-gray-800 dark:text-gray-400 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white"
             >
               <svg
                 class="fill-current"
@@ -100,7 +168,10 @@
             </a>
           </div>
         </div>
-        <button @click="isProfileInfoModal = true" class="edit-button">
+        <button 
+          @click="isProfileInfoModal = true" 
+          class="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto"
+        >
           <svg
             class="fill-current"
             width="18"
@@ -313,7 +384,16 @@
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
+import Swal from 'sweetalert2'
 import Modal from './Modal.vue'
+
+const props = defineProps({
+  user: { type: Object, required: true },
+  type: { type: String, required: true }
+})
+
+const emit = defineEmits(['refresh'])
 
 const isProfileInfoModal = ref(false)
 
@@ -321,5 +401,115 @@ const saveProfile = () => {
   // Implement save profile logic here
   console.log('Profile saved')
   isProfileInfoModal.value = false
+}
+
+const toggleDeactivate = async () => {
+  const isDeactivating = !props.user.deactivated_at
+  const action = isDeactivating ? 'deactivate' : 'activate'
+  
+  const result = await Swal.fire({
+    title: `Are you sure?`,
+    text: isDeactivating 
+      ? `This will prevent ${props.user.name} from logging into the portal. You can reactivate the account at any time.` 
+      : `This will restore portal access for ${props.user.name}.`,
+    icon: isDeactivating ? 'warning' : 'info',
+    showCancelButton: true,
+    confirmButtonColor: isDeactivating ? '#ef4444' : '#22c55e',
+    cancelButtonColor: '#71717a',
+    confirmButtonText: `Yes, ${action}!`,
+    cancelButtonText: 'No, cancel',
+    background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
+    color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1e293b',
+    customClass: {
+      popup: 'rounded-2xl border border-gray-200 dark:border-gray-800',
+      confirmButton: 'rounded-lg px-5 py-2.5 text-white font-medium',
+      cancelButton: 'rounded-lg px-5 py-2.5 text-white font-medium'
+    }
+  })
+
+  if (result.isConfirmed) {
+    try {
+      await axios.delete(`/api/staff/${props.user.id}`)
+      emit('refresh')
+      Swal.fire({
+        title: 'Success!',
+        text: `The account has been ${action}d successfully.`,
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+        background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
+        color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1e293b'
+      })
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: `Failed to ${action} user. Please try again.`,
+        icon: 'error',
+        background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
+        color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1e293b'
+      })
+    }
+  }
+}
+const showFullImage = () => {
+  if (!props.user.original?.url) return
+  
+  Swal.fire({
+    imageUrl: props.user.original.url,
+    imageAlt: props.user.name,
+    showConfirmButton: false,
+    showCloseButton: true,
+    background: 'transparent',
+    backdrop: `rgba(0,0,0,0.9)`,
+    customClass: {
+      image: 'max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl',
+      popup: 'bg-transparent border-none shadow-none p-0',
+    }
+  })
+}
+
+const fileInput = ref(null)
+
+const handlePhotoUpload = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('photo', file)
+  formData.append('_method', 'PATCH') // Use PATCH for update
+
+  try {
+    Swal.fire({
+      title: 'Uploading...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    })
+
+    let endpoint = ''
+    if (props.type === 'staff') endpoint = `/api/staff/${props.user.id}`
+    else if (props.type === 'student') endpoint = `/api/students/${props.user.id}`
+    else if (props.type === 'parent') endpoint = `/api/parents/${props.user.id}`
+
+    await axios.post(endpoint, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+
+    emit('refresh')
+    
+    Swal.fire({
+      title: 'Success!',
+      text: 'Profile picture updated.',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false
+    })
+  } catch (error) {
+    console.error('Upload failed:', error)
+    Swal.fire({
+      title: 'Upload Failed',
+      text: error.response?.data?.message || 'Failed to upload image.',
+      icon: 'error'
+    })
+  }
 }
 </script>

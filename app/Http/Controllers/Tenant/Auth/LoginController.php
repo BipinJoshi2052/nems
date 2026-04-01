@@ -27,7 +27,6 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        // dd(DB::table('users')->first());
         // Attempt authentication against the TENANT users table
         // The tenant database is already initialized by middleware
         $user = DB::table('users')->where('email', $credentials['email'])->first();
@@ -51,8 +50,13 @@ class LoginController extends Controller
         return response()->json([
             'access_token' => $accessToken,
             'user' => [
+                'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'role' => $user->is_owner ? 'admin' : 'staff',
+                'userType' => $user->user_type ?? 'staff',
+                'language_preference' => $user->language_preference ?? 'en',
+                'is_setup_complete' => (bool) ($user->is_setup_complete ?? false),
             ],
             'redirect' => '/dashboard',
         ])->withCookie(cookie(
@@ -96,8 +100,13 @@ class LoginController extends Controller
             return response()->json([
                 'access_token' => $accessToken,
                 'user' => [
+                    'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'role' => $user->is_owner ? 'admin' : 'staff',
+                    'userType' => $user->user_type ?? 'staff',
+                    'language_preference' => $user->language_preference ?? 'en',
+                    'is_setup_complete' => (bool) ($user->is_setup_complete ?? false),
                 ],
             ]);
         } catch (\Exception $e) {

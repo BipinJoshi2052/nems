@@ -10,4 +10,5 @@ enum AttachmentFolderEnum: string
     case Photos = 'photos';
     case Homework = 'homework';
     case LearningStories = 'learning_stories';
+    case Gallery = 'gallery';
 }

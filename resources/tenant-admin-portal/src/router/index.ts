@@ -31,6 +31,15 @@ const router = createRouter({
       },
     },
     {
+      path: '/profile/:type/:id',
+      name: 'user-profile',
+      component: () => import('../views/Others/UserProfile.vue'),
+      meta: {
+        title: 'User Profile',
+        requiresAuth: true,
+      },
+    },
+    {
       path: '/form-elements',
       name: 'Form Elements',
       component: () => import('../views/Forms/FormElements.vue'),
@@ -142,6 +151,49 @@ const router = createRouter({
         requiresAuth: false,
       },
     },
+    {
+      path: '/setup',
+      name: 'Onboarding',
+      component: () => import('../views/Pages/Onboarding/OnboardingWizard.vue'),
+      meta: {
+        title: 'School Setup',
+        requiresAuth: true,
+        roles: ['admin'],
+      },
+    },
+    {
+      path: '/staff',
+      name: 'Staff',
+      component: () => import('../views/Pages/Staff/StaffListView.vue'),
+      meta: {
+        title: 'Staff Management',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/students',
+      name: 'Students',
+      component: () => import('../views/Pages/Students/StudentListView.vue'),
+      meta: {
+        title: 'Student Directory',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/parents',
+      name: 'parents',
+      component: () => import('@/views/Pages/Users/ParentListView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/settings/school',
+      name: 'SchoolSettings',
+      component: () => import('../views/Pages/Settings/SchoolSettingsView.vue'),
+      meta: {
+        title: 'School Settings',
+        requiresAuth: true,
+      },
+    },
   ],
 })
 
@@ -168,6 +220,12 @@ router.beforeEach(async (to, from, next) => {
     if (requiredRoles && userRole && !requiredRoles.includes(userRole)) {
       // Redirect to dashboard (their home) if they don't have permission
       next({ name: 'Dashboard' })
+      return
+    }
+
+    // Onboarding redirect
+    if (userRole === 'admin' && authStore.user?.is_setup_complete === false && to.name !== 'Onboarding') {
+      next({ name: 'Onboarding' })
       return
     }
   }

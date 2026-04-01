@@ -48,12 +48,13 @@ class SecurityHeadersMiddleware
         }
 
         // Local: Vite dev (vite.config.js)
-        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174';
-        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174';
+        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174 http://localhost:5180 http://127.0.0.1:5180';
+        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174 ws://localhost:5180 ws://127.0.0.1:5180';
+        $appDomains = 'http://nems.com http://*.nems.com http://nems.com:8000 http://*.nems.com:8000';
 
         return implode('; ', [
             "default-src 'self'",
-            "img-src 'self' data: blob: {$uiAvatars}",
+            "img-src 'self' data: blob: {$uiAvatars} {$appDomains}",
             "font-src 'self' data: {$bunny} {$googleStatic} {$viteHttp}",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$jsdelivr} {$viteHttp}",
             "style-src 'self' 'unsafe-inline' {$bunny} {$googleFonts} {$jsdelivr} {$viteHttp}",

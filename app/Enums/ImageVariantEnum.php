@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum ImageVariantEnum: string
+enum ImageVariantEnum: int
 {
-    case Original = 'original';
-    case Thumbnail = 'thumbnail';
+    case Original = 1;
+    case Thumbnail = 2;
 }

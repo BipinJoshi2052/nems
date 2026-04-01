@@ -7,27 +7,15 @@
 
           <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
             <div>
-              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Country</p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">United States</p>
+              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Address</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ user.address || 'Not Provided' }}</p>
             </div>
 
-            <div>
-              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">City/State</p>
+            <div v-if="user.permanent_address">
+              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Permanent Address</p>
               <p class="text-sm font-medium text-gray-800 dark:text-white/90">
-                Phoenix, United States
+                {{ user.permanent_address }}
               </p>
-            </div>
-
-            <div>
-              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Postal Code
-              </p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">ERT 2489</p>
-            </div>
-
-            <div>
-              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">TAX ID</p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">AS4568384</p>
             </div>
           </div>
         </div>
@@ -164,12 +152,17 @@
 import { ref } from 'vue'
 import Modal from './Modal.vue'
 
+const props = defineProps({
+  user: { type: Object, required: true },
+  type: { type: String, required: true }
+})
+
 const isProfileAddressModal = ref(false)
 
 const saveProfile = () => {
   // Implement save profile logic here
   console.log('Profile saved')
-  isProfileInfoModal.value = false
+  isProfileAddressModal.value = false
 }
 </script>
 

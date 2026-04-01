@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Tenant\AttachmentFile;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,8 +13,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory;
-    use Notifiable;
+    use HasFactory, Notifiable, HasUuids;
 
     protected $guarded = ['id'];
 
@@ -29,6 +30,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_secret' => 'encrypted',
             'two_factor_confirmed_at' => 'datetime',
+            'deactivated_at' => 'datetime',
         ];
     }
 
@@ -50,5 +52,15 @@ class User extends Authenticatable
     public function isPlatformAdmin(): bool
     {
         return $this->role?->name === 'PlatformAdmin';
+    }
+
+    public function thumbnail(): BelongsTo
+    {
+        return $this->belongsTo(AttachmentFile::class, 'thumbnail_id');
+    }
+
+    public function original(): BelongsTo
+    {
+        return $this->belongsTo(AttachmentFile::class, 'original_id');
     }
 }

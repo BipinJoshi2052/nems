@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'platform.admin' => \App\Http\Middleware\PlatformAdminMiddleware::class,
             'platform.tenant' => \App\Http\Middleware\TenantOnlyMiddleware::class,
             'tenant.status' => \App\Http\Middleware\Tenant\CheckTenantStatus::class,
+            'auth.jwt' => \App\Http\Middleware\Tenant\AuthenticateJwt::class,
         ]);
 
         $middleware->appendToGroup('web', [

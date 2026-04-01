@@ -1,5 +1,5 @@
 <template>
-  <component :is="activeLayout">
+  <MainLayout>
     <div v-if="authStore.user?.role === 'admin'" class="grid grid-cols-12 gap-4 md:gap-6">
       <div class="col-span-12 space-y-6 xl:col-span-7">
         <ecommerce-metrics />
@@ -45,17 +45,11 @@
         </div>
       </div>
     </div>
-  </component>
+  </MainLayout>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import AdminLayout from '../components/layout/AdminLayout.vue'
-import TeacherLayout from '../components/layout/TeacherLayout.vue'
-import AccountantLayout from '../components/layout/AccountantLayout.vue'
-import ReceptionistLayout from '../components/layout/ReceptionistLayout.vue'
-import StaffLayout from '../components/layout/StaffLayout.vue'
-import ParentLayout from '../components/layout/ParentLayout.vue'
+import MainLayout from '@/components/layout/MainLayout.vue'
 
 import EcommerceMetrics from '../components/ecommerce/EcommerceMetrics.vue'
 import MonthlyTarget from '../components/ecommerce/MonthlySale.vue'
@@ -67,16 +61,4 @@ import RecentOrders from '../components/ecommerce/RecentOrders.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
-
-const activeLayout = computed(() => {
-  const role = authStore.user?.role
-  switch (role) {
-    case 'admin': return AdminLayout
-    case 'teacher': return TeacherLayout
-    case 'accountant': return AccountantLayout
-    case 'receptionist': return ReceptionistLayout
-    case 'parent': return ParentLayout
-    default: return StaffLayout
-  }
-})
 </script>

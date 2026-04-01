@@ -12,10 +12,10 @@ class AuditService
     public function record(
         string $action,
         ?string $subjectType = null,
-        ?int $subjectId = null,
+        ?string $subjectId = null,
         ?array $oldValues = null,
         ?array $newValues = null,
-        ?int $userId = null,
+        ?string $userId = null,
         ?string $ip = null,
     ): void {
         WriteAuditLogJob::dispatch(

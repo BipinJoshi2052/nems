@@ -13,7 +13,8 @@ export const useAuthStore = defineStore('auth', {
       email: string,
       role: string,
       userType: 'staff' | 'parent',
-      language_preference: 'en' | 'ne'
+      language_preference: 'en' | 'ne',
+      is_setup_complete: boolean
     } | null,
     loading: false,
   }),

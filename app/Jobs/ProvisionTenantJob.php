@@ -58,6 +58,10 @@ class ProvisionTenantJob implements ShouldQueue
             $adminEmail = $tenant->email;
 
             \Log::info("Initializing tenant context for role seeding and user creation.");
+            
+            // Get the platform user password to sync to tenant before switching context
+            $platformPassword = DB::table('users')->where('email', $adminEmail)->value('password');
+
             tenancy()->initialize($tenant);
             
             $roleId = DB::table('roles')->where('name', 'school_admin')->value('id');
@@ -70,10 +74,12 @@ class ProvisionTenantJob implements ShouldQueue
                 ]);
             }
 
-            $userId = DB::table('users')->insertGetId([
+            $userId = (string) Str::uuid();
+            DB::table('users')->insert([
+                'id' => $userId,
                 'name' => 'Admin User',
                 'email' => $adminEmail,
-                'password' => Hash::make(Str::random(16)),
+                'password' => $platformPassword ?? Hash::make(Str::random(16)),
                 'is_owner' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
