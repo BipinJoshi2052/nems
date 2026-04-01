@@ -49,8 +49,8 @@ class SecurityHeadersMiddleware
         }
 
         // Local: Vite dev (vite.config.js)
-        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174 http://localhost:5180 http://127.0.0.1:5180';
-        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174 ws://localhost:5180 ws://127.0.0.1:5180';
+        $viteHttp = 'http://localhost:5173 http://127.0.0.1:5173 http://localhost:5174 http://127.0.0.1:5174 http://localhost:5180 http://127.0.0.1:5180 http://localhost:5181 http://127.0.0.1:5181 http://localhost:5182 http://127.0.0.1:5182';
+        $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173 ws://localhost:5174 ws://127.0.0.1:5174 ws://localhost:5180 ws://127.0.0.1:5180 ws://localhost:5181 ws://127.0.0.1:5181 ws://localhost:5182 ws://127.0.0.1:5182';
         $appDomains = 'http://nems.com http://*.nems.com http://nems.com:8000 http://*.nems.com:8000';
 
         return implode('; ', [

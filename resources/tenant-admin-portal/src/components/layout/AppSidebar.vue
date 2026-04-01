@@ -305,6 +305,12 @@ const allMenuGroups = [
     items: [
       {
         icon: PlugInIcon,
+        name: "General Settings",
+        path: "/settings/general",
+        roles: ["admin"],
+      },
+      {
+        icon: PlugInIcon,
         name: "School Settings",
         path: "/settings/school",
         roles: ["admin"],

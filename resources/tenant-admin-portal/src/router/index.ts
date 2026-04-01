@@ -186,6 +186,15 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/settings/general',
+      name: 'GeneralSettings',
+      component: () => import('../views/Pages/Settings/GeneralSettingsView.vue'),
+      meta: {
+        title: 'General Settings',
+        requiresAuth: true,
+      },
+    },
+    {
       path: '/settings/school',
       name: 'SchoolSettings',
       component: () => import('../views/Pages/Settings/SchoolSettingsView.vue'),

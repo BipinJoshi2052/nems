@@ -16,6 +16,8 @@ use App\Enums\AttachmentFolderEnum;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Spatie\Permission\Models\Role;
+use App\Models\Tenant\Staff;
 
 class StaffController extends Controller
 {
@@ -25,10 +27,13 @@ class StaffController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::query()->with(['thumbnail', 'original'])->where('is_owner', false);
+        $query = User::query()->with(['thumbnail', 'original', 'role', 'staff'])
+            ->whereHas('role', function($q) {
+                $q->whereIn('name', ['staff', 'teacher', 'accountant', 'receptionist']);
+            });
 
         if ($request->role) {
-            $query->where('role', $request->role);
+            $query->whereHas('role', fn($q) => $q->where('name', $request->role));
         }
 
         if ($request->status === 'active') {
@@ -37,7 +42,7 @@ class StaffController extends Controller
             $query->whereNotNull('deactivated_at');
         }
 
-        return $this->applyFiltersAndPaginate($query, $request, ['name', 'email', 'designation']);
+        return $this->applyFiltersAndPaginate($query, $request, ['name', 'email']);
     }
 
     public function show(User $user)
@@ -50,33 +55,44 @@ class StaffController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'role' => 'required|string',
+            'role' => 'required|string|exists:roles,name',
             'designation' => 'required|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make(Str::random(32)), // Random password until setup
-            'designation' => $request->designation,
-            'is_owner' => false,
-        ]);
+        return DB::transaction(function() use ($request) {
+            $role = Role::where('name', $request->role)->first();
+            
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make(Str::random(32)),
+                'role_id' => $role?->id,
+                'is_owner' => false,
+            ]);
 
-        // Assign role (assuming Spatie or similar, will use a placeholder for now)
-        // $user->assignRole($request->role);
+            if ($request->hasFile('photo')) {
+                $this->handlePhotoUpload($user, $request->file('photo'), AttachmentFolderEnum::Photos);
+            }
 
-        $inviteUrl = URL::signedRoute('staff.setup-password', ['user' => $user->id], now()->addHours(48));
+            $staff = Staff::create([
+                'user_id' => $user->id,
+                'designation' => $request->designation,
+            ]);
 
-        // Send Email (Placeholder)
-        // Mail::to($user->email)->send(new StaffInviteMail($user, $inviteUrl));
+            $inviteUrl = URL::signedRoute('users.setup-password', ['user' => $user->id], now()->addHours(48));
 
-        $this->audit->record('invite_staff', 'User', $user->id, null, $user->toArray());
+            $this->audit->record('invite_staff', 'User', $user->id, null, [
+                'user' => $user->toArray(),
+                'staff' => $staff->toArray()
+            ]);
 
-        return response()->json([
-            'message' => 'Staff invited successfully',
-            'invite_url' => $inviteUrl, // For testing/dev
-            'user' => $user
-        ]);
+            return response()->json([
+                'message' => 'Staff invited successfully',
+                'invite_url' => $inviteUrl,
+                'user' => $user->load(['staff', 'role'])
+            ]);
+        });
     }
 
     public function update(Request $request, User $user)

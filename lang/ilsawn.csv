@@ -157,11 +157,13 @@ Management;;
 "March 15, 2026";;
 "March 29, 2026";;
 "Max Students";;
-menu.menu;Menu;मेनु
+menu.;;
 menu.attendance;Attendance;हाजिरी
 menu.calendar;Calendar;पात्रो
 menu.dashboard;Dashboard;ड्यासबोर्ड
 menu.finance;Finance;वित्त
+menu.general_settings;"General Settings";"सामान्य सेटिङहरू"
+menu.menu;Menu;मेनु
 menu.parents;Parents;अभिभावकहरू
 menu.profile;"User Profile";"प्रयोगकर्ता प्रोफाइल"
 menu.school_settings;"School Settings";"विद्यालय सेटिङहरू"

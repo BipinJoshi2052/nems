@@ -14,6 +14,11 @@ class Student extends Model
 
     protected $guarded = ['id'];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
+
     protected $casts = [
         'date_of_birth_ad' => 'date',
         'withdrawn_at' => 'datetime',

@@ -13,6 +13,9 @@ use Illuminate\Support\Str;
 use App\Http\Traits\HandlesAttachments;
 use App\Enums\AttachmentFolderEnum;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\URL;
 
 class ParentController extends Controller
 {
@@ -29,29 +32,69 @@ class ParentController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email|unique:parent_users,email',
+            'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string',
+            'students' => 'nullable|array',
+            'students.*.id' => 'exists:students,id',
+            'students.*.relationship' => 'required|string',
         ]);
 
-        $parent = ParentUser::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make(Str::random(32)),
-        ]);
+        return DB::transaction(function() use ($request) {
+            $role = Role::where('name', 'parent')->first();
+            
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make(Str::random(32)),
+                'role_id' => $role?->id,
+            ]);
 
-        if ($request->hasFile('photo')) {
-            $this->handlePhotoUpload($parent, $request->file('photo'), AttachmentFolderEnum::Photos);
-        }
+            $parent = ParentUser::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make(Str::random(32)),
+                'user_id' => $user->id,
+            ]);
 
-        $this->audit->record('create_parent', 'ParentUser', $parent->id, null, $parent->toArray());
+            if ($request->hasFile('photo')) {
+                $this->handlePhotoUpload($parent, $request->file('photo'), AttachmentFolderEnum::Photos);
+                $user->update([
+                    'thumbnail_id' => $parent->thumbnail_id,
+                    'original_id' => $parent->original_id,
+                ]);
+            }
 
-        return response()->json(['message' => 'Parent created', 'parent' => $parent->load(['thumbnail', 'original'])], 201);
+            if ($request->students) {
+                $syncData = [];
+                foreach ($request->students as $student) {
+                    $syncData[$student['id']] = [
+                        'relationship' => $student['relationship'],
+                        'is_primary_contact' => $student['is_primary_contact'] ?? false
+                    ];
+                }
+                $parent->students()->sync($syncData);
+            }
+
+            $inviteUrl = URL::signedRoute('users.setup-password', ['user' => $user->id], now()->addHours(48));
+
+            $this->audit->record('create_parent', 'ParentUser', $parent->id, null, $parent->toArray());
+
+            return response()->json([
+                'message' => 'Parent created', 
+                'invite_url' => $inviteUrl,
+                'parent' => $parent->load(['thumbnail', 'original', 'students'])
+            ], 201);
+        });
     }
 
     public function show(ParentUser $parent)
     {
-        return response()->json($parent->load('students'));
+        return response()->json($parent->load([
+            'students.enrollments.class', 
+            'students.enrollments.section', 
+            'students.thumbnail'
+        ]));
     }
 
     public function update(Request $request, ParentUser $parent)
@@ -60,6 +103,9 @@ class ParentController extends Controller
             'name' => 'sometimes|string',
             'email' => 'sometimes|email|unique:parent_users,email,' . $parent->id,
             'phone' => 'nullable|string',
+            'students' => 'nullable|array',
+            'students.*.id' => 'exists:students,id',
+            'students.*.relationship' => 'required|string',
         ]);
 
         $oldData = $parent->toArray();
@@ -69,6 +115,17 @@ class ParentController extends Controller
             $this->handlePhotoUpload($parent, $request->file('photo'), AttachmentFolderEnum::Photos);
         }
         
+        if ($request->has('students')) {
+            $syncData = [];
+            foreach ($request->students as $student) {
+                $syncData[$student['id']] = [
+                    'relationship' => $student['relationship'],
+                    'is_primary_contact' => $student['is_primary_contact'] ?? false
+                ];
+            }
+            $parent->students()->sync($syncData);
+        }
+
         $this->audit->record('update_parent', 'ParentUser', $parent->id, $oldData, $parent->toArray());
 
         return response()->json(['message' => 'Parent updated', 'parent' => $parent->load(['thumbnail', 'original'])]);

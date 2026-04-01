@@ -3,12 +3,15 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 import tailwindcss from '@tailwindcss/vite';
+import vueJsx from '@vitejs/plugin-vue-jsx';
+import vueDevTools from 'vite-plugin-vue-devtools';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./resources/tenant-admin-portal/src', import.meta.url))
+            '@': fileURLToPath(new URL('./resources/tenant-admin-portal/src', import.meta.url)),
+            '@locales': fileURLToPath(new URL('./resources/tenant-admin-portal/src/locales', import.meta.url)),
         },
     },
     plugins: [
@@ -28,6 +31,8 @@ export default defineConfig({
                 },
             },
         }),
+        vueJsx(),
+        vueDevTools(),
         vuetify({ autoImport: true }),
         tailwindcss(),
     ],
@@ -39,5 +44,11 @@ export default defineConfig({
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
+        fs: {
+            allow: [
+                fileURLToPath(new URL('./', import.meta.url)),
+                fileURLToPath(new URL('./resources/tenant-admin-portal', import.meta.url))
+            ]
+        }
     },
 });

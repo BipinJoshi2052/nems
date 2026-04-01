@@ -1,6 +1,6 @@
 <template>
   <admin-layout>
-    <PageBreadcrumb :pageTitle="currentPageTitle" />
+    <PageBreadcrumb :pageTitle="currentPageTitle" :items="breadcrumbItems" />
 
     <div v-if="loading" class="flex justify-center py-20">
       <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
@@ -14,6 +14,7 @@
       </h3>
       <profile-card :user="userData" :type="type" @refresh="fetchUserData" />
       <academic-info-card :user="userData" :type="type" />
+      <children-links-card :user="userData" :type="type" />
       <personal-info-card :user="userData" :type="type" />
       <address-card :user="userData" :type="type" />
     </div>
@@ -27,7 +28,7 @@
 <script setup>
 import AdminLayout from '../../components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
@@ -35,6 +36,7 @@ import ProfileCard from '../../components/profile/ProfileCard.vue'
 import AcademicInfoCard from '../../components/profile/AcademicInfoCard.vue'
 import PersonalInfoCard from '../../components/profile/PersonalInfoCard.vue'
 import AddressCard from '../../components/profile/AddressCard.vue'
+import ChildrenLinksCard from '../../components/profile/ChildrenLinksCard.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -50,6 +52,23 @@ const entityType = computed(() => {
 })
 
 const currentPageTitle = computed(() => `${entityType.value} Profile`)
+
+const breadcrumbItems = computed(() => {
+  const from = route.query.from
+  if (from === 'parent' && type.value === 'student' && route.query.parentId) {
+    return [
+      { label: 'Parents', route: { name: 'parents' } },
+      { label: `${route.query.parentName} Profile`, route: { name: 'user-profile', params: { type: 'parent', id: route.query.parentId } } }
+    ]
+  }
+
+  if (type.value === 'parent') {
+    return [{ label: 'Parents', route: { name: 'parents' } }]
+  } else if (type.value === 'student') {
+    return [{ label: 'Students', route: { name: 'Students' } }]
+  }
+  return []
+})
 
 const fetchUserData = async () => {
   loading.value = true
@@ -69,6 +88,8 @@ const fetchUserData = async () => {
     loading.value = false
   }
 }
+
+watch([() => route.params.type, () => route.params.id], fetchUserData)
 
 onMounted(fetchUserData)
 </script>

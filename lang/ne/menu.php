@@ -7,6 +7,8 @@ return array (
   'calendar' => 'पात्रो',
   'dashboard' => 'ड्यासबोर्ड',
   'finance' => 'वित्त',
+  'general_settings' => 'सामान्य सेटिङहरू',
+  'menu' => 'मेनु',
   'parents' => 'अभिभावकहरू',
   'profile' => 'प्रयोगकर्ता प्रोफाइल',
   'school_settings' => 'विद्यालय सेटिङहरू',

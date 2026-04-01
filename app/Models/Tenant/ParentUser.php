@@ -18,6 +18,11 @@ class ParentUser extends Authenticatable
 
     protected $guarded = ['id'];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
+
     protected $hidden = [
         'password',
         'remember_token',

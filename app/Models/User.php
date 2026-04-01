@@ -17,6 +17,29 @@ class User extends Authenticatable
 
     protected $guarded = ['id'];
 
+    public function role(): BelongsTo
+    {
+        if (app()->bound(\Stancl\Tenancy\Contracts\Tenant::class)) {
+            return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'role_id');
+        }
+        return $this->belongsTo(PlatformRole::class, 'role_id');
+    }
+
+    public function staff(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Tenant\Staff::class, 'user_id');
+    }
+
+    public function student(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Tenant\Student::class, 'user_id');
+    }
+
+    public function parentProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Tenant\ParentUser::class, 'user_id');
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -34,10 +57,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(PlatformRole::class, 'role_id');
-    }
 
     public function tenant(): BelongsTo
     {

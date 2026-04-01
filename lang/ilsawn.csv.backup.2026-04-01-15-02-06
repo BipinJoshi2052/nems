@@ -162,6 +162,8 @@ menu.attendance;Attendance;हाजिरी
 menu.calendar;Calendar;पात्रो
 menu.dashboard;Dashboard;ड्यासबोर्ड
 menu.finance;Finance;वित्त
+menu.general_settings;"General Settings";"सामान्य सेटिङहरू"
+menu.menu;Menu;मेनु
 menu.parents;Parents;अभिभावकहरू
 menu.profile;"User Profile";"प्रयोगकर्ता प्रोफाइल"
 menu.school_settings;"School Settings";"विद्यालय सेटिङहरू"
@@ -170,6 +172,7 @@ menu.staff;Staff;कर्मचारी
 menu.students;Students;विद्यार्थीहरू
 menu.title;Menu;मेनु
 menu.user_management;"User Management";"प्रयोगकर्ता व्यवस्थापन"
+menu.user_profile;"User Profile";"प्रयोगकर्ता प्रोफाइल"
 Message;;
 mo;;
 Montessori;;
@@ -287,8 +290,6 @@ Unlimited;;
 "Unlimited Students";;
 "Up to 500 Students";;
 "Update password";;
-validation.email;"The :attribute must be a valid email address.";":attribute वैध इमेल ठेगाना हुनुपर्छ।"
-validation.required;"The :attribute field is required.";":attribute आवश्यक छ।"
 "Verify and Enable";;
 "Verify and Sign In";;
 "Verify OTP";;

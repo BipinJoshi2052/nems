@@ -50,6 +50,9 @@ Route::middleware([
         Route::middleware('guest')->group(function () {
             Route::get('/login', [LoginController::class, 'showLoginForm'])->name('tenant.login');
             Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('tenant.password.reset');
+            Route::get('/setup-password/{user}', function() {
+                return view('tenant.spa');
+            })->name('users.setup-password');
         });
 
         // Authenticated Routes (Blade)

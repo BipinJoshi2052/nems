@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Traits\HandlesAttachments;
 use App\Enums\AttachmentFolderEnum;
 use App\Models\Tenant\AttachmentFile;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -50,6 +54,7 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
             'admission_no' => 'required|string|unique:students,admission_no',
             'class_id' => 'required|exists:classes,id',
             'academic_year_id' => 'required|exists:academic_years,id',
@@ -61,13 +66,30 @@ class StudentController extends Controller
         ]);
 
         return DB::transaction(function() use ($request) {
-            $student = Student::create($request->only([
-                'name', 'admission_no', 'date_of_birth_ad', 'date_of_birth_bs', 
-                'gender', 'medical_notes', 'class_id', 'academic_year_id', 'section_id', 'roll_no'
-            ]));
+            $role = Role::where('name', 'student')->first();
+            
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make(Str::random(32)),
+                'role_id' => $role?->id,
+            ]);
+
+            $student = Student::create(array_merge(
+                $request->only([
+                    'name', 'admission_no', 'date_of_birth_ad', 'date_of_birth_bs', 
+                    'gender', 'medical_notes', 'class_id', 'academic_year_id', 'section_id', 'roll_no'
+                ]),
+                ['user_id' => $user->id]
+            ));
 
             if ($request->hasFile('photo')) {
                 $this->handlePhotoUpload($student, $request->file('photo'), AttachmentFolderEnum::Photos);
+                // Also link to user for profile pic
+                $user->update([
+                    'thumbnail_id' => $student->thumbnail_id,
+                    'original_id' => $student->original_id,
+                ]);
             }
 
             Enrollment::create([
@@ -78,9 +100,15 @@ class StudentController extends Controller
                 'promotion_status' => 'pending',
             ]);
 
+            $inviteUrl = URL::signedRoute('users.setup-password', ['user' => $user->id], now()->addHours(48));
+
             $this->audit->record('create_student', 'Student', $student->id, null, $student->toArray());
 
-            return response()->json(['message' => 'Student enrolled', 'student' => $student->load(['thumbnail', 'original'])], 201);
+            return response()->json([
+                'message' => 'Student enrolled', 
+                'invite_url' => $inviteUrl,
+                'student' => $student->load(['thumbnail', 'original'])
+            ], 201);
         });
     }
 

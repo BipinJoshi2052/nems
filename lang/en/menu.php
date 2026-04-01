@@ -7,6 +7,8 @@ return array (
   'calendar' => 'Calendar',
   'dashboard' => 'Dashboard',
   'finance' => 'Finance',
+  'general_settings' => 'General Settings',
+  'menu' => 'Menu',
   'parents' => 'Parents',
   'profile' => 'User Profile',
   'school_settings' => 'School Settings',

@@ -1,8 +1,9 @@
 <template>
   <MainLayout>
     <div class="p-4 md:p-6">
+    <PageBreadcrumb pageTitle="Student Directory" />
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Student Directory</h2>
+      <div></div>
       <button 
         @click="showAddModal = true"
         class="flex items-center gap-2 px-4 py-2 text-white transition bg-primary rounded-lg hover:bg-opacity-90 font-semibold"
@@ -140,7 +141,7 @@
     </div>
 
     <!-- Enrollment Wizard Modal -->
-    <div v-if="showAddModal" class="fixed inset-0 z-[999] flex items-center justify-center bg-gray-400/20 backdrop-blur-[32px] p-4 font-outfit">
+    <div v-if="showAddModal" class="fixed inset-0 z-[99] flex items-center justify-center bg-gray-400/20 backdrop-blur-[32px] p-4 font-outfit">
       <div class="bg-white dark:bg-boxdark w-full max-w-4xl p-6 rounded-lg shadow-xl overflow-y-auto max-h-[90vh] text-gray-900 dark:text-white">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-xl font-bold dark:text-white">Enroll New Student</h3>
@@ -303,6 +304,7 @@ import Swal from 'sweetalert2'
 import _ from 'lodash'
 import MainLayout from '@/components/layout/MainLayout.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import FlatPickr from 'vue-flatpickr-component'
 import 'flatpickr/dist/flatpickr.css'
 import { VNepaliDatePicker } from 'vue-nepali-date-picker'
