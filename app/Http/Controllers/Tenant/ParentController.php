@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\URL;
+use App\Mail\UserInvitationMail;
+use Illuminate\Support\Facades\Mail;
 
 class ParentController extends Controller
 {
@@ -76,7 +78,18 @@ class ParentController extends Controller
                 $parent->students()->sync($syncData);
             }
 
-            $inviteUrl = URL::signedRoute('users.setup-password', ['user' => $user->id], now()->addHours(48));
+            $token = Str::random(64);
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $user->email],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now(),
+                ]
+            );
+
+            $inviteUrl = route('users.setup-password', ['token' => $token, 'email' => $user->email]);
+
+            Mail::to($user->email)->queue(new UserInvitationMail($user->name, $inviteUrl, tenant('name')));
 
             $this->audit->record('create_parent', 'ParentUser', $parent->id, null, $parent->toArray());
 
@@ -91,9 +104,12 @@ class ParentController extends Controller
     public function show(ParentUser $parent)
     {
         return response()->json($parent->load([
+            'students.user',
             'students.enrollments.class', 
             'students.enrollments.section', 
-            'students.thumbnail'
+            'students.thumbnail',
+            'thumbnail',
+            'original',
         ]));
     }
 
@@ -103,13 +119,20 @@ class ParentController extends Controller
             'name' => 'sometimes|string',
             'email' => 'sometimes|email|unique:parent_users,email,' . $parent->id,
             'phone' => 'nullable|string',
+            'address' => 'nullable|string',
+            'facebook_url' => 'nullable|string',
+            'x_url' => 'nullable|string',
+            'linkedin_url' => 'nullable|string',
+            'instagram_url' => 'nullable|string',
             'students' => 'nullable|array',
             'students.*.id' => 'exists:students,id',
             'students.*.relationship' => 'required|string',
         ]);
 
         $oldData = $parent->toArray();
-        $parent->update($request->only(['name', 'email', 'phone']));
+        $parent->update($request->only([
+            'name', 'email', 'phone', 'address', 'facebook_url', 'x_url', 'linkedin_url', 'instagram_url'
+        ]));
 
         if ($request->hasFile('photo')) {
             $this->handlePhotoUpload($parent, $request->file('photo'), AttachmentFolderEnum::Photos);

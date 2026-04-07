@@ -17,7 +17,7 @@ class PlatformAdminMiddleware
     {
         $user = $request->user();
 
-        if (!$user || !$user->isPlatformAdmin()) {
+        if (!$user || !$user->isPlatformStaff()) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthorized.'], 403);
             }

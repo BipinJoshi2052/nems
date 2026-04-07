@@ -8,6 +8,7 @@ use App\Models\Tenant\ClassModel;
 use App\Http\Traits\HandlesPaginationAndSearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AcademicYearController extends Controller
 {
@@ -15,7 +16,7 @@ class AcademicYearController extends Controller
 
     public function index(Request $request)
     {
-        $query = AcademicYear::query();
+        $query = AcademicYear::query()->orderBy('start_date', 'desc');
         return $this->applyFiltersAndPaginate($query, $request, ['name']);
     }
 
@@ -84,6 +85,11 @@ class AcademicYearController extends Controller
 
     public function update(Request $request, AcademicYear $academicYear)
     {
+        Log::info('Updating academic year', [
+            'id' => $academicYear->id,
+            'data' => $request->all()
+        ]);
+
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'start_date' => 'sometimes|date',
@@ -92,6 +98,7 @@ class AcademicYearController extends Controller
         ]);
 
         if (isset($validated['is_active']) && $validated['is_active']) {
+            Log::info('Activating academic year', ['id' => $academicYear->id]);
             AcademicYear::where('id', '!=', $academicYear->id)->update(['is_active' => false]);
         }
 

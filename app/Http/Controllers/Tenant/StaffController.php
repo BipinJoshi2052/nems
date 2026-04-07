@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Spatie\Permission\Models\Role;
 use App\Models\Tenant\Staff;
+use App\Mail\UserInvitationMail;
+use Illuminate\Support\Facades\Mail;
 
 class StaffController extends Controller
 {
@@ -29,16 +31,17 @@ class StaffController extends Controller
     {
         $query = User::query()->with(['thumbnail', 'original', 'role', 'staff'])
             ->whereHas('role', function($q) {
-                $q->whereIn('name', ['staff', 'teacher', 'accountant', 'receptionist']);
+                $q->whereIn('name', ['staff', 'teacher', 'accountant', 'receptionist', 'admin']);
             });
 
         if ($request->role) {
-            $query->whereHas('role', fn($q) => $q->where('name', $request->role));
+            $query->whereHas('role', fn($q) => $q->where('name', 'ilike', $request->role));
         }
 
-        if ($request->status === 'active') {
+        $status = $request->status ?: 'active';
+        if ($status === 'active') {
             $query->whereNull('deactivated_at');
-        } elseif ($request->status === 'deactivated') {
+        } elseif ($status === 'deactivated') {
             $query->whereNotNull('deactivated_at');
         }
 
@@ -47,7 +50,7 @@ class StaffController extends Controller
 
     public function show(User $user)
     {
-        return response()->json($user->load(['thumbnail', 'original']));
+        return response()->json($user->load(['thumbnail', 'original', 'staff']));
     }
 
     public function invite(Request $request)
@@ -80,7 +83,18 @@ class StaffController extends Controller
                 'designation' => $request->designation,
             ]);
 
-            $inviteUrl = URL::signedRoute('users.setup-password', ['user' => $user->id], now()->addHours(48));
+            $token = Str::random(64);
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $user->email],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now(),
+                ]
+            );
+
+            $inviteUrl = route('users.setup-password', ['token' => $token, 'email' => $user->email]);
+
+            Mail::to($user->email)->queue(new UserInvitationMail($user->name, $inviteUrl, tenant('name')));
 
             $this->audit->record('invite_staff', 'User', $user->id, null, [
                 'user' => $user->toArray(),
@@ -102,11 +116,22 @@ class StaffController extends Controller
         $request->validate([
             'name' => 'sometimes|string|max:255',
             'designation' => 'sometimes|string',
+            'address' => 'nullable|string',
+            'facebook_url' => 'nullable|string',
+            'x_url' => 'nullable|string',
+            'linkedin_url' => 'nullable|string',
+            'instagram_url' => 'nullable|string',
             'role' => 'sometimes|string',
             'photo' => 'sometimes|image|max:2048',
         ]);
 
-        $user->update($request->only(['name', 'designation']));
+        $user->update($request->only(['name']));
+        
+        if ($user->staff) {
+            $user->staff->update($request->only([
+                'designation', 'address', 'facebook_url', 'x_url', 'linkedin_url', 'instagram_url'
+            ]));
+        }
         
         if ($request->hasFile('photo')) {
             $this->handlePhotoUpload($user, $request->file('photo'), AttachmentFolderEnum::Photos);

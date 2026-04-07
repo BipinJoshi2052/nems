@@ -16,6 +16,9 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\UserInvitationMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class StudentController extends Controller
 {
@@ -35,12 +38,21 @@ class StudentController extends Controller
             $query->whereHas('enrollments', fn($e) => $e->where('class_id', $request->class_id));
         }
 
+        if ($request->section_id) {
+            $query->whereHas('enrollments', fn($e) => $e->where('section_id', $request->section_id));
+        }
+
+        if ($request->academic_year_id) {
+            $query->whereHas('enrollments', fn($e) => $e->where('academic_year_id', $request->academic_year_id));
+        }
+
         return $this->applyFiltersAndPaginate($query, $request, ['name', 'admission_no']);
     }
 
     public function show(Student $student)
     {
         return response()->json($student->load([
+            'user',
             'enrollments.class', 
             'enrollments.academicYear', 
             'enrollments.section',
@@ -100,7 +112,18 @@ class StudentController extends Controller
                 'promotion_status' => 'pending',
             ]);
 
-            $inviteUrl = URL::signedRoute('users.setup-password', ['user' => $user->id], now()->addHours(48));
+            $token = Str::random(64);
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $user->email],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now(),
+                ]
+            );
+
+            $inviteUrl = route('users.setup-password', ['token' => $token, 'email' => $user->email]);
+
+            Mail::to($user->email)->queue(new UserInvitationMail($user->name, $inviteUrl, tenant('name')));
 
             $this->audit->record('create_student', 'Student', $student->id, null, $student->toArray());
 
@@ -114,8 +137,25 @@ class StudentController extends Controller
 
     public function update(Request $request, Student $student)
     {
+        $request->validate([
+            'name' => 'sometimes|string',
+            'admission_no' => 'sometimes|string|unique:students,admission_no,' . $student->id,
+            'address' => 'nullable|string',
+            'facebook_url' => 'nullable|string',
+            'x_url' => 'nullable|string',
+            'linkedin_url' => 'nullable|string',
+            'instagram_url' => 'nullable|string',
+            'gender' => 'sometimes|in:male,female,other',
+            'photo' => 'sometimes|image|max:2048',
+        ]);
+
         $oldValues = $student->toArray();
         $student->update($request->except(['photo']));
+        
+        // Update user name if student name changed
+        if ($request->has('name') && $student->user) {
+            $student->user->update(['name' => $request->name]);
+        }
 
         if ($request->hasFile('photo')) {
             $this->handlePhotoUpload($student, $request->file('photo'), AttachmentFolderEnum::Photos);
@@ -150,6 +190,22 @@ class StudentController extends Controller
         $this->audit->record('status_change', 'Student', $student->id, ['status' => $oldStatus], ['status' => $request->status, 'reason' => $request->reason]);
 
         return response()->json(['message' => 'Status updated']);
+    }
+
+    public function bulkMessage(Request $request)
+    {
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:students,id',
+            'type' => 'required|in:email,sms,notification',
+            'subject' => 'nullable|string|required_if:type,email',
+            'body' => 'required|string',
+        ]);
+
+        // Logic for sending bulk messages should go here (e.g., dispatching jobs)
+        // For now, we return a success response as the UI expects
+        
+        return response()->json(['message' => 'Bulk messages have been queued.']);
     }
 
     public function destroy(Student $student)

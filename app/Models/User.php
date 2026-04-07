@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->role?->name === 'PlatformAdmin';
     }
 
+    public function isPlatformStaff(): bool
+    {
+        return in_array($this->role?->name, ['PlatformAdmin', 'Staff']);
+    }
+
     public function thumbnail(): BelongsTo
     {
         return $this->belongsTo(AttachmentFile::class, 'thumbnail_id');

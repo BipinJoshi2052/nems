@@ -1,38 +1,37 @@
 <template>
   <MainLayout>
-    <div class="p-4 md:p-8 font-outfit">
-      <div class="mb-8">
-        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">General Settings</h2>
-        <p class="text-gray-500 dark:text-gray-400 mt-1">Manage your institution's core preferences and system appearance.</p>
+    <div class="p-4 md:p-6">
+      <div class="mb-4">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">General Settings</h2>
+        <p class="text-sm text-gray-500">Manage your institution's core preferences and system appearance.</p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Sidebar Navigation (Internal) -->
-        <div class="lg:col-span-3 space-y-2">
-          <button 
-            v-for="tab in tabs" 
-            :key="tab.id"
-            @click="activeTab = tab.id"
-            :class="[
-              'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm',
-              activeTab === tab.id 
-                ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]' 
-                : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-            ]"
-          >
-            <component :is="tab.icon" class="w-5 h-5" />
-            {{ tab.name }}
-          </button>
+      <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-sm overflow-hidden">
+        <!-- Tabs Header -->
+        <div class="pt-2 px-2 pb-0 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-transparent">
+          <div class="flex gap-2 overflow-x-auto no-scrollbar">
+            <button 
+              v-for="tab in tabs" 
+              :key="tab.id"
+              @click="activeTab = tab.id"
+              :class="activeTab === tab.id ? 'border-primary text-primary font-bold' : 'border-transparent text-gray-500 hover:text-gray-700'"
+              class="px-5 py-4 border-b-2 transition-all whitespace-nowrap text-sm tracking-tight"
+            >
+              {{ tab.name }}
+            </button>
+          </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="lg:col-span-9">
-          <div class="bg-white dark:bg-boxdark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 md:p-8">
+        <!-- Card Body / Content -->
+        <div class="p-6 md:p-8 min-h-[400px]">
             
             <!-- Appearance Group -->
-            <div v-if="activeTab === 'appearance'" class="space-y-8 animate-fadeIn">
+            <div v-if="activeTab === 'appearance'" class="space-y-10 animate-fadeIn">
               <div>
-                <h3 class="text-xl font-bold dark:text-white mb-6 border-b dark:border-gray-800 pb-4">Personalization</h3>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white/90 mb-6 flex items-center gap-2">
+                  <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+                  Personalization
+                </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <!-- Theme Toggle -->
@@ -70,9 +69,12 @@
             </div>
 
             <!-- Academic Group -->
-            <div v-if="activeTab === 'academic'" class="space-y-8 animate-fadeIn">
+            <div v-if="activeTab === 'academic'" class="space-y-10 animate-fadeIn">
               <div>
-                <h3 class="text-xl font-bold dark:text-white mb-6 border-b dark:border-gray-800 pb-4">Academic Preferences</h3>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white/90 mb-6 flex items-center gap-2">
+                  <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+                  Academic Preferences
+                </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -108,9 +110,12 @@
             </div>
 
             <!-- Security/System Group -->
-            <div v-if="activeTab === 'security'" class="space-y-8 animate-fadeIn">
+            <div v-if="activeTab === 'security'" class="space-y-10 animate-fadeIn">
               <div>
-                <h3 class="text-xl font-bold dark:text-white mb-6 border-b dark:border-gray-800 pb-4">Security & System</h3>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white/90 mb-6 flex items-center gap-2">
+                  <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+                  Security & System
+                </h3>
                 
                 <div class="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl">
                    <div class="flex items-center gap-4">
@@ -127,13 +132,12 @@
               </div>
             </div>
 
-            <div class="flex justify-end gap-4 mt-12 pt-8 border-t dark:border-gray-800">
-              <button class="px-6 py-3 text-sm font-bold text-gray-500 hover:text-gray-700">Discard Changes</button>
-              <button @click="saveSettings" class="px-10 py-3 bg-primary text-white rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all">Save Preferences</button>
+            <div class="flex justify-end gap-3 mt-12 pt-8 border-t border-gray-100 dark:border-gray-800">
+              <button class="px-6 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">Discard</button>
+              <button @click="saveSettings" class="px-8 py-2.5 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:bg-opacity-90 transition-all tracking-tight">Save Preferences</button>
             </div>
 
           </div>
-        </div>
       </div>
     </div>
   </MainLayout>
@@ -186,5 +190,12 @@ const saveSettings = () => {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>

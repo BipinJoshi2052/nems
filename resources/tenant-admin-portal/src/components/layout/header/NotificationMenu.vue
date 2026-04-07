@@ -100,6 +100,7 @@ let pollInterval = null
 
 const fetchUnreadCount = async () => {
   try {
+    return 0;
     const { data } = await axios.get('/api/notifications/unread-count')
     notificationCount.value = data.count
     notifying.value = data.count > 0

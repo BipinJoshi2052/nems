@@ -17,8 +17,8 @@ class TenantOnlyMiddleware
     {
         $user = $request->user();
 
-        if ($user && $user->isPlatformAdmin()) {
-            return redirect()->route('platform.dashboard')->with('error', 'Platform admins cannot access tenant profile pages.');
+        if ($user && $user->isPlatformStaff()) {
+            return redirect()->route('platform.dashboard')->with('error', 'Platform admins/staff cannot access tenant profile pages.');
         }
 
         return $next($request);

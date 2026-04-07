@@ -1,0 +1,40 @@
+academic
+
+student list
+keep search and add button in same row, after add button insert actions button [click this opens dropdown with options - send email, send sms, send notification - clicking these opens a modal which shows selected students, and a message input (must check at least one student)]
+add checkboxes and sn columns in the list 
+
+
+student profile
+back button - on click of the back button - should keep the filters data as it was before entering the student profile page
+add tabs / side nav menus - profile, attendance, homework, fees, reviews [create dummy pages for other than profile which we have not created]
+when user clicks image and is shown in a popup, the sidenav and top nav are visible, should cover all visible dom - same happens in parent page when i open add new parent modal
+
+staff page
+search and add staff in one row
+
+
+file manager page
+in the first row, two sections, one section tenant is shown all media with a search and a upload file button, inside this we show users categories like image, videos, audio, docs with total size that has been uploaded, in another section we show storage details, total, space used, ----to do
+in the second section we show users all the folders and files like in a file manager, where he can see his folders, files , can navigate inside folders, can create folders
+
+general settings
+use same tab view like in school settings rather than the side nav
+the fonts in this page look different from other pages, check
+
+platform admin portal
+
+tenants page
+add filters, search, pagination
+show tenants status with colors so it can be visually understood
+
+
+core
+tenants database name should be tenant-<domain-prefix>, if abc.nems.com then tenant-abc
+implement queue, use database queuing, all queues are stored in main db with tenant information like tenant id, worker connects to database after finding the database name from tenants table
+
+issue - store tenants databases name in database_name column in tenants table rather than data table, just store plan id in data for now
+
+
+
+wrap main content in card

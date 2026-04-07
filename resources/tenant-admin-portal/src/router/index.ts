@@ -152,6 +152,15 @@ const router = createRouter({
       },
     },
     {
+      path: '/setup-password/:token',
+      name: 'SetupPassword',
+      component: () => import('../views/Auth/SetupPassword.vue'),
+      meta: {
+        title: 'Setup Password',
+        requiresAuth: false,
+      },
+    },
+    {
       path: '/setup',
       name: 'Onboarding',
       component: () => import('../views/Pages/Onboarding/OnboardingWizard.vue'),
@@ -200,6 +209,15 @@ const router = createRouter({
       component: () => import('../views/Pages/Settings/SchoolSettingsView.vue'),
       meta: {
         title: 'School Settings',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/settings/roles',
+      name: 'RoleSettings',
+      component: () => import('../views/Pages/Settings/RolesSettingsView.vue'),
+      meta: {
+        title: 'Roles & Permissions',
         requiresAuth: true,
       },
     },

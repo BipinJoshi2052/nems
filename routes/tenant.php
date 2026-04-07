@@ -16,6 +16,8 @@ use App\Http\Controllers\Tenant\ParentController;
 use App\Http\Controllers\Tenant\ClassController;
 use App\Http\Controllers\Tenant\SectionController;
 use App\Http\Controllers\Tenant\SubjectController;
+use App\Http\Controllers\Tenant\RoleController;
+use App\Http\Controllers\Tenant\PermissionController;
 use App\Http\Middleware\ResolveTenant;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -50,7 +52,7 @@ Route::middleware([
         Route::middleware('guest')->group(function () {
             Route::get('/login', [LoginController::class, 'showLoginForm'])->name('tenant.login');
             Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('tenant.password.reset');
-            Route::get('/setup-password/{user}', function() {
+            Route::get('/dashboard/setup-password/{token}', function() {
                 return view('tenant.spa');
             })->name('users.setup-password');
         });
@@ -72,6 +74,7 @@ Route::middleware([
             Route::post('/logout', [LoginController::class, 'logout']);
             Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
             Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
+            Route::post('/setup-password', [LoginController::class, 'setupPassword']);
         });
 
         // Protected API Endpoints
@@ -95,7 +98,11 @@ Route::middleware([
             });
 
             // Academic Year Endpoints
+            Route::get('/api/academic-years/previous-classes', [AcademicYearController::class, 'previousClasses']);
+            Route::get('/api/academic-years/previous-assignments', [AcademicYearController::class, 'previousAssignments']);
+            Route::post('/api/academic-years/validate', [AcademicYearController::class, 'validateData']);
             Route::apiResource('/api/academic-years', AcademicYearController::class);
+            
             Route::get('/api/setup/academic-years/previous-classes', [AcademicYearController::class, 'previousClasses']);
             Route::get('/api/setup/academic-years/previous-assignments', [AcademicYearController::class, 'previousAssignments']);
             Route::post('/api/setup/academic-years/validate', [AcademicYearController::class, 'validateData']);
@@ -117,13 +124,22 @@ Route::middleware([
             Route::get('/api/students', [StudentController::class, 'index']);
             Route::post('/api/students', [StudentController::class, 'store']);
             Route::get('/api/students/{student}', [StudentController::class, 'show']);
-            Route::patch('/api/students/{student}', [StudentController::class, 'update']);
             Route::patch('/api/students/{student}/status', [StudentController::class, 'updateStatus']);
+            Route::post('/api/students/bulk-message', [StudentController::class, 'bulkMessage']);
             Route::delete('/api/students/{student}', [StudentController::class, 'destroy']);
 
             // Parent Management
             Route::apiResource('/api/parents', ParentController::class);
             Route::post('/api/parents/link-to-student/{student}', [ParentController::class, 'linkToStudent']);
+
+            // Roles & Permissions
+            Route::get('/api/roles', [RoleController::class, 'index']);
+            Route::post('/api/roles', [RoleController::class, 'store']);
+            Route::patch('/api/roles/{role}', [RoleController::class, 'update']);
+            Route::delete('/api/roles/{role}', [RoleController::class, 'destroy']);
+            Route::post('/api/roles/{role}/permissions', [RoleController::class, 'updatePermissions']);
+            Route::get('/api/permissions', [PermissionController::class, 'index']);
+            Route::post('/api/permissions', [PermissionController::class, 'store']);
         });
 
         // Serve Tenant Storage Files

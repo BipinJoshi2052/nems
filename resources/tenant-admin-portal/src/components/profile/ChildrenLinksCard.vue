@@ -13,11 +13,13 @@
       >
         <img v-if="student.thumbnail" :src="student.thumbnail.url" class="w-14 h-14 rounded-full object-cover border-2 border-primary/20 group-hover:border-primary transition-colors" />
         <div v-else class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold group-hover:bg-primary group-hover:text-white transition-all">
-          {{ student.name.charAt(0) }}
+          {{ (student.name || student.user?.name || '?').charAt(0) }}
         </div>
         
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">{{ student.name }}</p>
+          <p class="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+            {{ student.name || student.user?.name }}
+          </p>
           <p class="text-[10px] text-gray-500 font-medium">
             {{ student.enrollments?.[0]?.class?.name || 'N/A' }} • {{ student.enrollments?.[0]?.section?.name || 'N/A' }}
           </p>

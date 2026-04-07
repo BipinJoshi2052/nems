@@ -1,50 +1,73 @@
 <template>
   <AdminLayout>
     <div class="p-4 md:p-6">
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Staff Management</h2>
-      <button 
-        @click="showInviteModal = true"
-        class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90 flex items-center gap-2"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        <span>Add Staff</span>
-      </button>
+      <PageBreadcrumb pageTitle="Staff Management" />
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Staff Management</h2>
+      <p class="text-sm text-gray-500">Manage your institution's employees, teachers, and administrative staff.</p>
     </div>
 
-    <!-- Filters -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="md:col-span-2">
-        <input 
-          v-model="filters.q" 
-          type="text" 
-          placeholder="Search staff by name, email or designation..." 
-          class="w-full px-4 py-2 border rounded-lg dark:bg-boxdark dark:border-strokedark focus:outline-none focus:border-primary"
-        />
+    <!-- Filters Card -->
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-sm overflow-hidden mb-6">
+      <div class="p-5 md:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-6 mb-8">
+          <div class="relative flex-1 max-w-xl">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input 
+              v-model="filters.q" 
+              type="text" 
+              placeholder="Search staff by name, email or designation..." 
+              class="w-full pl-11 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-boxdark focus:outline-none focus:border-primary transition-all shadow-sm text-sm"
+            />
+          </div>
+          
+          <button 
+            @click="showInviteModal = true"
+            class="flex items-center justify-center gap-2 px-6 py-3 text-white bg-primary rounded-xl hover:bg-opacity-90 font-bold shadow-lg shadow-primary/20 transition-all text-sm whitespace-nowrap"
+          >
+            <PlusIcon class="w-5 h-5" />
+            <span>Add Staff</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-widest text-gray-400 ml-1">Staff Role</label>
+            <select 
+              v-model="filters.role"
+              class="w-full px-4 py-3 border border-gray-210 dark:border-gray-700 rounded-xl dark:bg-boxdark outline-none focus:border-primary transition-all cursor-pointer text-sm font-medium"
+            >
+              <option value="">All Roles</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+              <option value="staff">Staff</option>
+              <option value="accountant">Accountant</option>
+              <option value="receptionist">Receptionist</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-widest text-gray-400 ml-1">Account Status</label>
+            <select 
+              v-model="filters.status"
+              class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl dark:bg-boxdark outline-none focus:border-primary transition-all cursor-pointer text-sm font-medium"
+            >
+              <option value="">All Status</option>
+              <option value="active">Active Only</option>
+              <option value="deactivated">Deactivated</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <select 
-        v-model="filters.role"
-        class="w-full px-4 py-2 border rounded-lg dark:bg-boxdark dark:border-strokedark focus:outline-none focus:border-primary"
-      >
-        <option value="">All Roles</option>
-        <option value="Teacher">Teacher</option>
-        <option value="Admin">Admin</option>
-        <option value="Staff">Staff</option>
-      </select>
-      <select 
-        v-model="filters.status"
-        class="w-full px-4 py-2 border rounded-lg dark:bg-boxdark dark:border-strokedark focus:outline-none focus:border-primary"
-      >
-        <option value="">All Status</option>
-        <option value="active">Active</option>
-        <option value="deactivated">Deactivated</option>
-      </select>
     </div>
 
-    <!-- Staff Table -->
-    <div class="bg-white dark:bg-boxdark rounded-lg shadow-sm overflow-hidden">
+    <!-- Staff List Card -->
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead class="bg-gray-50 dark:bg-meta-4">
           <tr>
@@ -120,10 +143,11 @@
       </table>
       </div>
 
-      <!-- Pagination -->
-      <Pagination :meta="pagination" @change="fetchStaff" />
+      <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800">
+        <Pagination :meta="pagination" @change="fetchStaff" />
+      </div>
     </div>
-
+  </div>
     <!-- Invitation Modal -->
     <div v-if="showInviteModal" class="fixed inset-0 z-[99] flex items-center justify-center bg-gray-400/20 backdrop-blur-[32px] p-4 font-outfit">
       <div class="bg-white dark:bg-boxdark w-full max-w-4xl p-6 rounded-lg shadow-xl text-gray-900 dark:text-white overflow-y-auto max-h-[90vh]">
@@ -230,11 +254,11 @@
           <div>
             <label class="block text-sm font-medium mb-1 dark:text-white">Role</label>
             <select v-model="selectedStaff!.role" class="w-full px-4 py-2 border rounded dark:bg-meta-4 dark:border-strokedark text-black dark:text-white">
-              <option value="Admin">Admin</option>
-              <option value="Teacher">Teacher</option>
-              <option value="Accountant">Accountant</option>
-              <option value="Receptionist">Receptionist</option>
-              <option value="Staff">General Staff</option>
+              <option value="admin">Admin</option>
+              <option value="teacher">Teacher</option>
+              <option value="accountant">Accountant</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="staff">General Staff</option>
             </select>
           </div>
           <div class="flex justify-end gap-2 mt-6">
@@ -258,6 +282,7 @@ import _ from 'lodash'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import { PlusIcon } from '@/icons'
 
 const router = useRouter()
 
@@ -291,7 +316,7 @@ const currentPage = computed(() => pagination.value.current_page)
 const filters = ref({
   q: '',
   role: '',
-  status: '',
+  status: 'active',
   page: 1
 })
 

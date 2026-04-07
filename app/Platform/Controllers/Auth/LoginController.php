@@ -16,9 +16,12 @@ class LoginController extends Controller
 {
     public function showLoginForm(): View|RedirectResponse
     {
-        if (Auth::guard('platform')->check()) {
-            return redirect()->route('platform.dashboard');
+        if ($user = Auth::guard('platform')->user()) {
+            return $user->isPlatformStaff() 
+                ? redirect()->route('platform.dashboard')
+                : redirect()->route('profile');
         }
+
         if (Auth::guard('customer')->check() || Auth::check()) {
             return redirect()->route('profile');
         }
@@ -50,8 +53,15 @@ class LoginController extends Controller
 
         Auth::guard('platform')->login($user, $request->boolean('remember'));
         $request->session()->regenerate();
-        // dd($user->role?->name);
-        if ($user->isPlatformAdmin()) {
+        
+        \Log::info('Login Redirect Trace', [
+            'user_id' => $user->id,
+            'role_name' => $user->role?->name,
+            'is_platform_staff' => $user->isPlatformStaff(),
+            'is_platform_admin' => $user->isPlatformAdmin(),
+        ]);
+
+        if ($user->isPlatformStaff()) {
             return redirect()->intended(route('platform.dashboard'));
         }
 

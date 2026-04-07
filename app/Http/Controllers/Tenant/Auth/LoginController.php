@@ -46,6 +46,17 @@ class LoginController extends Controller
             'type' => 'refresh',
         ], 604800); // 7 days
 
+        // Fetch role name if role_id exists
+        $roleName = 'staff';
+        if ($user->is_owner) {
+            $roleName = 'admin';
+        } elseif ($user->role_id) {
+            $role = DB::table('roles')->where('id', $user->role_id)->first();
+            if ($role) {
+                $roleName = $role->name;
+            }
+        }
+
         // Return token and set HttpOnly cookie
         return response()->json([
             'access_token' => $accessToken,
@@ -53,7 +64,7 @@ class LoginController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $user->is_owner ? 'admin' : 'staff',
+                'role' => $roleName,
                 'userType' => $user->user_type ?? 'staff',
                 'language_preference' => $user->language_preference ?? 'en',
                 'is_setup_complete' => (bool) ($user->is_setup_complete ?? false),
@@ -97,13 +108,24 @@ class LoginController extends Controller
                 'tenant' => tenant('id'),
             ]);
 
+            // Fetch role name if role_id exists
+            $roleName = 'staff';
+            if ($user->is_owner) {
+                $roleName = 'admin';
+            } elseif ($user->role_id) {
+                $role = DB::table('roles')->where('id', $user->role_id)->first();
+                if ($role) {
+                    $roleName = $role->name;
+                }
+            }
+
             return response()->json([
                 'access_token' => $accessToken,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'role' => $user->is_owner ? 'admin' : 'staff',
+                    'role' => $roleName,
                     'userType' => $user->user_type ?? 'staff',
                     'language_preference' => $user->language_preference ?? 'en',
                     'is_setup_complete' => (bool) ($user->is_setup_complete ?? false),
@@ -118,5 +140,53 @@ class LoginController extends Controller
     {
         return response()->json(['message' => 'Logged out successfully'])
             ->withoutCookie('tenant_refresh_token');
+    }
+
+    public function setupPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()->letters()->numbers()->symbols()],
+        ]);
+
+        $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+
+        if (!$record || !Hash::check($request->token, $record->token)) {
+            return response()->json(['message' => 'Invalid or expired setup link.'], 422);
+        }
+
+        // Logic check: Token expiry (48 hours, as per invitation)
+        if (now()->subHours(48)->gt($record->created_at)) {
+            return response()->json(['message' => 'Setup link has expired.'], 422);
+        }
+
+        $user = DB::table('users')->where('email', $request->email)->first();
+        if (! $user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        DB::transaction(function () use ($user, $request) {
+            $hash = Hash::make($request->password);
+            
+            DB::table('users')->where('id', $user->id)->update([
+                'password' => $hash,
+                'email_verified_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Clear password reset tokens
+            DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
+            // Log history
+            DB::table('password_histories')->insert([
+                'user_id' => $user->id,
+                'user_type' => 'tenant_user',
+                'password_hash' => $hash,
+                'created_at' => now(),
+            ]);
+        });
+
+        return response()->json(['message' => 'Account setup complete! You can now sign in.']);
     }
 }

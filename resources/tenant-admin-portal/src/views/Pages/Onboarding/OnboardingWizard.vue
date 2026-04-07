@@ -52,19 +52,17 @@ import axios from 'axios'
 import SchoolInfoStep from '@/components/onboarding/SchoolInfoStep.vue'
 import AcademicYearStep from '@/components/onboarding/AcademicYearStep.vue'
 import SubjectsStep from '@/components/onboarding/SubjectsStep.vue'
-import ClassesStep from '@/components/onboarding/ClassesStep.vue'
 import InviteTeachersStep from '@/components/onboarding/InviteTeachersStep.vue'
 import AddFirstStudentStep from '@/components/onboarding/AddFirstStudentStep.vue'
 
 const currentStep = ref(1)
-const totalSteps = 6
+const totalSteps = 5
 const wizardState = ref({})
 
 const steps = [
   SchoolInfoStep,
   AcademicYearStep,
   SubjectsStep,
-  ClassesStep,
   InviteTeachersStep,
   AddFirstStudentStep
 ]
